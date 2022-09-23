@@ -36,3 +36,9 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+// go list -m -json github.com/oraichain/wasmvm@multiwasm-0.14.0 | jq '.|"\(.Path) \(.Version)"' -r
+replace github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v0.14.1-0.20220923040432-f5efb135b81f
+
+// for local test
+// replace github.com/CosmWasm/wasmvm => ../wasmvm
