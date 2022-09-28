@@ -417,6 +417,8 @@ github.com/oraichain/wasmvm v0.14.1-0.20220923040432-f5efb135b81f h1:JNkwgtJihxL
 github.com/oraichain/wasmvm v0.14.1-0.20220923040432-f5efb135b81f/go.mod h1:Id107qllDJyJjVQQsKMOy2YYF98sqPJ2t+jX1QES40A=
 github.com/oraichain/wasmvm v0.14.1-0.20220927025727-eb5d1b3e5d3d h1:E8IcW5c1JA0gxTy+/YgAqnfypahCo6bObQGnxvj/OvI=
 github.com/oraichain/wasmvm v0.14.1-0.20220927025727-eb5d1b3e5d3d/go.mod h1:Id107qllDJyJjVQQsKMOy2YYF98sqPJ2t+jX1QES40A=
+github.com/oraichain/wasmvm v0.14.1-0.20220928022431-18a281091940 h1:5ZKBM14mIPuSfs65roL4B2iM2YKfHXhUff1+k2y6AHA=
+github.com/oraichain/wasmvm v0.14.1-0.20220928022431-18a281091940/go.mod h1:Id107qllDJyJjVQQsKMOy2YYF98sqPJ2t+jX1QES40A=
 github.com/otiai10/copy v1.6.0 h1:IinKAryFFuPONZ7cm6T6E2QX/vcJwSnlaA5lfoaXIiQ=
 github.com/otiai10/copy v1.6.0/go.mod h1:XWfuS3CrI0R6IE0FbgHsEazaXO8G0LpMp9o8tos0x4E=
 github.com/otiai10/curr v0.0.0-20150429015615-9b4961190c95/go.mod h1:9qAhocn7zKJG+0mI8eUu6xqkFDYS2kb2saOteoSB3cE=
