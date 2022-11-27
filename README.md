@@ -248,3 +248,4 @@ Or even testing the app and bringing up critical issues. The following have help
 * Leonardo Bragagnolo [bragaz](https://github.com/bragaz)
 
 Sorry if I forgot you from this list, just contact me or add yourself in a PR :)
+
