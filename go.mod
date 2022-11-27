@@ -6,8 +6,8 @@ require (
 	github.com/CosmWasm/wasmvm v1.1.1
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
 	github.com/cosmos/cosmos-sdk v0.45.10
-	github.com/cosmos/gogoproto v1.4.3
-	github.com/cosmos/iavl v0.19.4
+	github.com/cosmos/gogoproto v1.4.2
+	github.com/cosmos/iavl v0.19.3
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/cosmos/interchain-accounts v0.1.0
 	github.com/dvsekhvalnov/jose2go v1.5.0
@@ -128,6 +128,7 @@ require (
 )
 
 replace (
+	// go list -m -json github.com/oraichain/wasmvm@multiwasm-zk | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
@@ -138,6 +139,6 @@ replace (
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 	// go list -m -json github.com/oraichain/wasmvm@multiwasm-zk | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.2-0.20221122041437-fb0aac30f476
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.2-0.20221127013132-1eb62fd1efff
 
 )
