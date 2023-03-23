@@ -3,7 +3,7 @@ package legacy
 import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -19,7 +19,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 
 	// support legacy proposal querying
 	registry.RegisterImplementations(
-		(*govtypes.Content)(nil),
+		(*v1beta1.Content)(nil),
 		&StoreCodeProposal{},
 		&InstantiateContractProposal{},
 		&MigrateContractProposal{},
