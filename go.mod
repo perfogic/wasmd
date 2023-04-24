@@ -171,7 +171,7 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20230323050703-9ccaea61ca69
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20230424074553-74721bc68d30
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
