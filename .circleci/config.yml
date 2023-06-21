@@ -95,6 +95,20 @@ jobs:
             - "profiles/*"
       - store_artifacts:
           path: /tmp/logs
+  
+  test-system:
+    executor: golang
+    parallelism: 1
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run:
+          name: Build and run system tests
+          command: make test-system
 
   benchmark:
     executor: golang
@@ -124,7 +138,7 @@ jobs:
       - run:
           name: Run simulations
           command: |
-            make test-sim-multi-seed-short test-sim-import-export test-sim-deterministic
+            make test-sim-deterministic test-sim-multi-seed-short test-sim-import-export
       - store_artifacts:
           path: /tmp
 
@@ -232,6 +246,9 @@ workflows:
           requires:
             - setup-dependencies
       - upload-coverage:
+          requires:
+            - test-cover
+      - test-system:
           requires:
             - test-cover
       - benchmark:
