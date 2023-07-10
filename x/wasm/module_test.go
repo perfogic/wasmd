@@ -47,7 +47,7 @@ type testData struct {
 	module           AppModule
 	ctx              sdk.Context
 	acctKeeper       authkeeper.AccountKeeper
-	keeper           Keeper
+	keeper           keeper.Keeper
 	bankKeeper       bankkeeper.Keeper
 	stakingKeeper    *stakingkeeper.Keeper
 	faucet           *keeper.TestFaucet
@@ -57,7 +57,7 @@ type testData struct {
 }
 
 func setupTest(t *testing.T) testData {
-	ctx, keepers := CreateTestInput(t, false, "iterator,staking,stargate,cosmwasm_1_1")
+	ctx, keepers := keeper.CreateTestInput(t, false, "iterator,staking,stargate,cosmwasm_1_1")
 	encConf := keeper.MakeEncodingConfig(t)
 	queryRouter := baseapp.NewGRPCQueryRouter()
 	serviceRouter := baseapp.NewMsgServiceRouter()
@@ -108,32 +108,32 @@ func TestHandleCreate(t *testing.T) {
 		isValid bool
 	}{
 		"empty": {
-			msg:     &MsgStoreCode{},
+			msg:     &types.MsgStoreCode{},
 			isValid: false,
 		},
 		"invalid wasm": {
-			msg: &MsgStoreCode{
+			msg: &types.MsgStoreCode{
 				Sender:       addr1,
 				WASMByteCode: []byte("foobar"),
 			},
 			isValid: false,
 		},
 		"valid wasm": {
-			msg: &MsgStoreCode{
+			msg: &types.MsgStoreCode{
 				Sender:       addr1,
 				WASMByteCode: testContract,
 			},
 			isValid: true,
 		},
 		"other valid wasm": {
-			msg: &MsgStoreCode{
+			msg: &types.MsgStoreCode{
 				Sender:       addr1,
 				WASMByteCode: maskContract,
 			},
 			isValid: true,
 		},
 		"old wasm (0.7)": {
-			msg: &MsgStoreCode{
+			msg: &types.MsgStoreCode{
 				Sender:       addr1,
 				WASMByteCode: oldContract,
 			},
@@ -178,7 +178,7 @@ func TestHandleInstantiate(t *testing.T) {
 	data := setupTest(t)
 	creator := data.faucet.NewFundedRandomAccount(data.ctx, sdk.NewInt64Coin("denom", 100000))
 
-	msg := &MsgStoreCode{
+	msg := &types.MsgStoreCode{
 		Sender:       creator.String(),
 		WASMByteCode: testContract,
 	}
@@ -201,7 +201,7 @@ func TestHandleInstantiate(t *testing.T) {
 	require.NoError(t, err)
 
 	// create with no balance is also legal
-	initMsg := &MsgInstantiateContract{
+	initMsg := &types.MsgInstantiateContract{
 		Sender: creator.String(),
 		CodeID: firstCodeID,
 		Msg:    initMsgBz,
@@ -241,7 +241,7 @@ func TestHandleExecute(t *testing.T) {
 	creator := data.faucet.NewFundedRandomAccount(data.ctx, deposit.Add(deposit...)...)
 	fred := data.faucet.NewFundedRandomAccount(data.ctx, topUp...)
 
-	msg := &MsgStoreCode{
+	msg := &types.MsgStoreCode{
 		Sender:       creator.String(),
 		WASMByteCode: testContract,
 	}
@@ -259,7 +259,7 @@ func TestHandleExecute(t *testing.T) {
 	initMsgBz, err := json.Marshal(initMsg)
 	require.NoError(t, err)
 
-	initCmd := &MsgInstantiateContract{
+	initCmd := &types.MsgInstantiateContract{
 		Sender: creator.String(),
 		CodeID: firstCodeID,
 		Msg:    initMsgBz,
@@ -297,7 +297,7 @@ func TestHandleExecute(t *testing.T) {
 	require.NotNil(t, contractAcct)
 	assert.Equal(t, deposit, data.bankKeeper.GetAllBalances(data.ctx, contractAcct.GetAddress()))
 
-	execCmd := &MsgExecuteContract{
+	execCmd := &types.MsgExecuteContract{
 		Sender:   fred.String(),
 		Contract: contractBech32Addr,
 		Msg:      []byte(`{"release":{}}`),
@@ -375,7 +375,7 @@ func TestHandleExecuteEscrow(t *testing.T) {
 	data.faucet.Fund(data.ctx, creator, sdk.NewInt64Coin("denom", 100000))
 	fred := data.faucet.NewFundedRandomAccount(data.ctx, topUp...)
 
-	msg := &MsgStoreCode{
+	msg := &types.MsgStoreCode{
 		Sender:       creator.String(),
 		WASMByteCode: testContract,
 	}
@@ -392,7 +392,7 @@ func TestHandleExecuteEscrow(t *testing.T) {
 	initMsgBz, err := json.Marshal(initMsg)
 	require.NoError(t, err)
 
-	initCmd := MsgInstantiateContract{
+	initCmd := types.MsgInstantiateContract{
 		Sender: creator.String(),
 		CodeID: firstCodeID,
 		Msg:    initMsgBz,
@@ -411,7 +411,7 @@ func TestHandleExecuteEscrow(t *testing.T) {
 	handleMsgBz, err := json.Marshal(handleMsg)
 	require.NoError(t, err)
 
-	execCmd := MsgExecuteContract{
+	execCmd := types.MsgExecuteContract{
 		Sender:   fred.String(),
 		Contract: contractBech32Addr,
 		Msg:      handleMsgBz,
@@ -444,7 +444,7 @@ func TestReadWasmConfig(t *testing.T) {
 		return v
 	}
 	var one uint64 = 1
-	defaults := DefaultWasmConfig()
+	defaults := types.DefaultWasmConfig()
 
 	specs := map[string]struct {
 		src servertypes.AppOptions
