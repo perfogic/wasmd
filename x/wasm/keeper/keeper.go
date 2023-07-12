@@ -378,7 +378,7 @@ func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.AccAddress, caller 
 
 	data, err := k.handleContractResponse(ctx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "dispatch")
+		return nil, sdkerrors.Wrap(err, err.Error())
 	}
 
 	return data, nil

@@ -148,7 +148,7 @@ func (d MessageDispatcher) DispatchSubmessages(ctx sdk.Context, contractAddr sdk
 			// Issue #759 - we don't return error string for worries of non-determinism
 			moduleLogger(ctx).Info("Redacting submessage error", "cause", err)
 			result = wasmvmtypes.SubMsgResult{
-				Err: redactError(err).Error(),
+				Err: err.Error(),
 			}
 		}
 
@@ -184,8 +184,8 @@ func redactError(err error) error {
 	// sdk/11 is out of gas
 	// sdk/5 is insufficient funds (on bank send)
 	// (we can theoretically redact less in the future, but this is a first step to safety)
-	codespace, code, _ := sdkerrors.ABCIInfo(err, false)
-	return fmt.Errorf("codespace: %s, code: %d", codespace, code)
+	codespace, code, log := sdkerrors.ABCIInfo(err, false)
+	return fmt.Errorf("codespace: %s, code: %d. Error: %s", codespace, code, log)
 }
 
 func filterEvents(events []sdk.Event) []sdk.Event {

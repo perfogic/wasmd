@@ -68,7 +68,7 @@ func (q QueryHandler) Query(request wasmvmtypes.QueryRequest, gasLimit uint64) (
 	}
 
 	// Issue #759 - we don't return error string for worries of non-determinism
-	return nil, redactError(err)
+	return nil, err
 }
 
 func (q QueryHandler) GasConsumed() uint64 {
