@@ -129,6 +129,14 @@ func (q GrpcQuerier) AllContractState(c context.Context, req *types.QueryAllCont
 
 	r := make([]types.Model, 0)
 	prefixStore := prefix.NewStore(ctx.KVStore(q.storeKey), types.GetContractStorePrefix(contractAddr))
+
+	// fix pagination limit for contract state because it can be very big, limit is between 1, query.DefaultLimit
+	req.Pagination.Offset = 0         // do not use offset
+	req.Pagination.CountTotal = false // do not count total
+	if req.Pagination.Limit > query.DefaultLimit || req.Pagination.Limit <= 0 {
+		req.Pagination.Limit = uint64(query.DefaultLimit)
+	}
+
 	pageRes, err := query.FilteredPaginate(prefixStore, req.Pagination, func(key, value []byte, accumulate bool) (bool, error) {
 		if accumulate {
 			r = append(r, types.Model{
