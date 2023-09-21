@@ -64,12 +64,16 @@ func TestQueryAllContractState(t *testing.T) {
 					Offset: 1,
 				},
 			},
-			expModelContains: []types.Model{
-				{Key: []byte("foo"), Value: []byte(`"bar"`)},
+			expErr: errLegacyPaginationUnsupported,
+		},
+		"with pagination count": {
+			srcQuery: &types.QueryAllContractStateRequest{
+				Address: contractAddr.String(),
+				Pagination: &query.PageRequest{
+					CountTotal: true,
+				},
 			},
-			expModelContainsNot: []types.Model{
-				{Key: []byte{0x0, 0x1}, Value: []byte(`{"count":8}`)},
-			},
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			srcQuery: &types.QueryAllContractStateRequest{
@@ -108,6 +112,7 @@ func TestQueryAllContractState(t *testing.T) {
 				require.Equal(t, spec.expErr.Error(), err.Error())
 				return
 			}
+			require.NoError(t, err)
 			for _, exp := range spec.expModelContains {
 				assert.Contains(t, got.Models, exp)
 			}
@@ -171,7 +176,7 @@ func TestQuerySmartContractPanics(t *testing.T) {
 		CodeID:  1,
 		Created: types.NewAbsoluteTxPosition(ctx),
 	})
-	ctx = ctx.WithGasMeter(sdk.NewGasMeter(DefaultInstanceCost)).WithLogger(log.TestingLogger())
+	ctx = ctx.WithGasMeter(sdk.NewGasMeter(types.DefaultInstanceCost)).WithLogger(log.TestingLogger())
 
 	specs := map[string]struct {
 		doInContract func()
@@ -342,7 +347,7 @@ func TestQueryContractsByCode(t *testing.T) {
 					Offset: 5,
 				},
 			},
-			expAddr: contractAddrs[5:10],
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with invalid pagination key": {
 			req: &types.QueryContractsByCodeRequest{
@@ -352,7 +357,7 @@ func TestQueryContractsByCode(t *testing.T) {
 					Key:    []byte("test"),
 				},
 			},
-			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			req: &types.QueryContractsByCodeRequest{
@@ -401,6 +406,7 @@ func TestQueryContractHistory(t *testing.T) {
 		srcHistory []types.ContractCodeHistoryEntry
 		req        types.QueryContractHistoryRequest
 		expContent []types.ContractCodeHistoryEntry
+		expErr     error
 	}{
 		"response with internal fields cleared": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
@@ -470,12 +476,7 @@ func TestQueryContractHistory(t *testing.T) {
 					Offset: 1,
 				},
 			},
-			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Msg:       []byte(`"migrate message 1"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-			}},
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
@@ -510,7 +511,7 @@ func TestQueryContractHistory(t *testing.T) {
 				Updated:   types.NewAbsoluteTxPosition(ctx),
 				Msg:       []byte(`"init message"`),
 			}},
-			expContent: nil,
+			expContent: []types.ContractCodeHistoryEntry{},
 		},
 	}
 	for msg, spec := range specs {
@@ -522,14 +523,14 @@ func TestQueryContractHistory(t *testing.T) {
 
 			// when
 			q := Querier(keeper)
-			got, err := q.ContractHistory(sdk.WrapSDKContext(xCtx), &spec.req) //nolint:gosec
-
+			got, gotErr := q.ContractHistory(sdk.WrapSDKContext(xCtx), &spec.req) //nolint:gosec
 			// then
-			if spec.expContent == nil {
-				require.Error(t, types.ErrEmpty)
+			if spec.expErr != nil {
+				require.Error(t, gotErr)
+				assert.ErrorIs(t, gotErr, spec.expErr)
 				return
 			}
-			require.NoError(t, err)
+			require.NoError(t, gotErr)
 			assert.Equal(t, spec.expContent, got.Entries)
 		})
 	}
@@ -546,6 +547,7 @@ func TestQueryCodeList(t *testing.T) {
 		storedCodeIDs []uint64
 		req           types.QueryCodesRequest
 		expCodeIDs    []uint64
+		expErr        error
 	}{
 		"none": {},
 		"no gaps": {
@@ -563,7 +565,7 @@ func TestQueryCodeList(t *testing.T) {
 					Offset: 1,
 				},
 			},
-			expCodeIDs: []uint64{2, 3},
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			storedCodeIDs: []uint64{1, 2, 3},
@@ -597,10 +599,15 @@ func TestQueryCodeList(t *testing.T) {
 			}
 			// when
 			q := Querier(keeper)
-			got, err := q.Codes(sdk.WrapSDKContext(xCtx), &spec.req) //nolint:gosec
+			got, gotErr := q.Codes(sdk.WrapSDKContext(xCtx), &spec.req) //nolint:gosec
 
 			// then
-			require.NoError(t, err)
+			if spec.expErr != nil {
+				require.Error(t, gotErr)
+				require.ErrorIs(t, gotErr, spec.expErr)
+				return
+			}
+			require.NoError(t, gotErr)
 			require.NotNil(t, got.CodeInfos)
 			require.Len(t, got.CodeInfos, len(spec.expCodeIDs))
 			for i, exp := range spec.expCodeIDs {
@@ -690,7 +697,7 @@ func TestQueryPinnedCodes(t *testing.T) {
 	specs := map[string]struct {
 		srcQuery   *types.QueryPinnedCodesRequest
 		expCodeIDs []uint64
-		expErr     *errorsmod.Error
+		expErr     error
 	}{
 		"query all": {
 			srcQuery:   &types.QueryPinnedCodesRequest{},
@@ -702,7 +709,7 @@ func TestQueryPinnedCodes(t *testing.T) {
 					Offset: 1,
 				},
 			},
-			expCodeIDs: []uint64{exampleContract2.CodeID},
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			srcQuery: &types.QueryPinnedCodesRequest{
@@ -723,11 +730,13 @@ func TestQueryPinnedCodes(t *testing.T) {
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			got, err := q.PinnedCodes(sdk.WrapSDKContext(ctx), spec.srcQuery)
-			require.True(t, spec.expErr.Is(err), err)
+			got, gotErr := q.PinnedCodes(sdk.WrapSDKContext(ctx), spec.srcQuery)
 			if spec.expErr != nil {
+				require.Error(t, gotErr)
+				assert.ErrorIs(t, gotErr, spec.expErr)
 				return
 			}
+			require.NoError(t, gotErr)
 			require.NotNil(t, got)
 			assert.Equal(t, spec.expCodeIDs, got.CodeIDs)
 		})
@@ -943,8 +952,7 @@ func TestQueryContractsByCreatorList(t *testing.T) {
 					Offset: 1,
 				},
 			},
-			expContractAddr: allExpecedContracts[1:],
-			expErr:          nil,
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			srcQuery: &types.QueryContractsByCreatorRequest{
@@ -973,13 +981,13 @@ func TestQueryContractsByCreatorList(t *testing.T) {
 	q := Querier(keepers.WasmKeeper)
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			got, err := q.ContractsByCreator(sdk.WrapSDKContext(ctx), spec.srcQuery)
-
+			got, gotErr := q.ContractsByCreator(sdk.WrapSDKContext(ctx), spec.srcQuery)
 			if spec.expErr != nil {
-				require.Equal(t, spec.expErr, err)
+				require.Error(t, gotErr)
+				assert.ErrorContains(t, gotErr, spec.expErr.Error())
 				return
 			}
-			require.NoError(t, err)
+			require.NoError(t, gotErr)
 			require.NotNil(t, got)
 			assert.Equal(t, spec.expContractAddr, got.ContractAddresses)
 		})
@@ -992,4 +1000,48 @@ func fromBase64(s string) []byte {
 		panic(err)
 	}
 	return r
+}
+
+func TestEnsurePaginationParams(t *testing.T) {
+	specs := map[string]struct {
+		src    *query.PageRequest
+		exp    *query.PageRequest
+		expErr error
+	}{
+		"custom limit": {
+			src: &query.PageRequest{Limit: 10},
+			exp: &query.PageRequest{Limit: 10},
+		},
+		"limit not set": {
+			src: &query.PageRequest{},
+			exp: &query.PageRequest{Limit: 100},
+		},
+		"limit > max": {
+			src: &query.PageRequest{Limit: 101},
+			exp: &query.PageRequest{Limit: 100},
+		},
+		"no pagination params set": {
+			exp: &query.PageRequest{Limit: 100},
+		},
+		"non empty offset": {
+			src:    &query.PageRequest{Offset: 1},
+			expErr: errLegacyPaginationUnsupported,
+		},
+		"count enabled": {
+			src:    &query.PageRequest{CountTotal: true},
+			expErr: errLegacyPaginationUnsupported,
+		},
+	}
+	for name, spec := range specs {
+		t.Run(name, func(t *testing.T) {
+			got, gotErr := ensurePaginationParams(spec.src)
+			if spec.expErr != nil {
+				require.Error(t, gotErr)
+				assert.ErrorIs(t, gotErr, spec.expErr)
+				return
+			}
+			require.NoError(t, gotErr)
+			assert.Equal(t, spec.exp, got)
+		})
+	}
 }

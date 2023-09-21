@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -66,7 +67,7 @@ func GetTxCmd() *cobra.Command {
 		MigrateContractCmd(),
 		UpdateContractAdminCmd(),
 		ClearContractAdminCmd(),
-		GrantAuthorizationCmd(),
+		GrantCmd(),
 		UpdateInstantiateConfigCmd(),
 		SubmitProposalCmd(),
 	)
@@ -413,17 +414,31 @@ func parseExecuteArgs(contractAddr, execMsg string, sender sdk.AccAddress, flags
 	}, nil
 }
 
+func GrantCmd() *cobra.Command {
+	txCmd := &cobra.Command{
+		Use:                "grant",
+		Short:              "Grant a authz permission",
+		DisableFlagParsing: true,
+		SilenceUsage:       true,
+	}
+	txCmd.AddCommand(
+		GrantAuthorizationCmd(),
+		GrantStoreCodeAuthorizationCmd(),
+	)
+	return txCmd
+}
+
 func GrantAuthorizationCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "grant [grantee] [message_type=\"execution\"|\"migration\"] [contract_addr_bech32] --allow-raw-msgs [msg1,msg2,...] --allow-msg-keys [key1,key2,...] --allow-all-messages",
-		Short: "Grant authorization to an address",
+		Use:   "contract [message_type=\"execution\"|\"migration\"] [grantee] [contract_addr_bech32] --allow-raw-msgs [msg1,msg2,...] --allow-msg-keys [key1,key2,...] --allow-all-messages",
+		Short: "Grant authorization to interact with a contract on behalf of you",
 		Long: fmt.Sprintf(`Grant authorization to an address.
 Examples:
-$ %s tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
+$ %s tx grant contract execution <grantee_addr> <contract_addr> --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
 
-$ %s tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
+$ %s tx grant contract execution <grantee_addr> <contract_addr> --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
 
-$ %s tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
+$ %s tx grant contract execution <grantee_addr> <contract_addr> --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
 `, version.AppName, version.AppName, version.AppName),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -556,6 +571,52 @@ $ %s tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --ma
 	return cmd
 }
 
+func GrantStoreCodeAuthorizationCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "store-code [grantee] [code_hash:permission]",
+		Short: "Grant authorization to upload contract code on behalf of you",
+		Long: fmt.Sprintf(`Grant authorization to an address.
+Examples:
+$ %s tx grant store-code <grantee_addr> 13a1fc994cc6d1c81b746ee0c0ff6f90043875e0bf1d9be6b7d779fc978dc2a5:everybody  1wqrtry681b746ee0c0ff6f90043875e0bf1d9be6b7d779fc978dc2a5:nobody --expiration 1667979596
+
+$ %s tx grant store-code <grantee_addr> *:%s1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm,%s1vx8knpllrj7n963p9ttd80w47kpacrhuts497x
+`, version.AppName, version.AppName, version.AppName, version.AppName),
+		Args: cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			grantee, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			grants, err := parseStoreCodeGrants(args[1:])
+			if err != nil {
+				return err
+			}
+
+			authorization := types.NewStoreCodeAuthorization(grants...)
+
+			expire, err := getExpireTime(cmd)
+			if err != nil {
+				return err
+			}
+
+			grantMsg, err := authz.NewMsgGrant(clientCtx.GetFromAddress(), grantee, authorization, expire)
+			if err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), grantMsg)
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagExpiration, 0, "The Unix timestamp.")
+	return cmd
+}
+
 func getExpireTime(cmd *cobra.Command) (*time.Time, error) {
 	exp, err := cmd.Flags().GetInt64(flagExpiration)
 	if err != nil {
@@ -566,4 +627,33 @@ func getExpireTime(cmd *cobra.Command) (*time.Time, error) {
 	}
 	e := time.Unix(exp, 0)
 	return &e, nil
+}
+
+func parseStoreCodeGrants(args []string) ([]types.CodeGrant, error) {
+	grants := make([]types.CodeGrant, len(args))
+	for i, c := range args {
+		// format: code_hash:access_config
+		// access_config: nobody|everybody|address(es)
+		parts := strings.Split(c, ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid format")
+		}
+
+		if parts[1] == "*" {
+			grants[i] = types.CodeGrant{
+				CodeHash: []byte(parts[0]),
+			}
+			continue
+		}
+
+		accessConfig, err := parseAccessConfig(parts[1])
+		if err != nil {
+			return nil, err
+		}
+		grants[i] = types.CodeGrant{
+			CodeHash:              []byte(parts[0]),
+			InstantiatePermission: &accessConfig,
+		}
+	}
+	return grants, nil
 }
