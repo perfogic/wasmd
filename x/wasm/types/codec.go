@@ -3,14 +3,10 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	authzcodec "github.com/cosmos/cosmos-sdk/x/authz/codec"
-	govcodec "github.com/cosmos/cosmos-sdk/x/gov/codec"
 	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	groupcodec "github.com/cosmos/cosmos-sdk/x/group/codec"
 )
 
 // RegisterLegacyAminoCodec registers the account types and interface
@@ -31,19 +27,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgAddCodeUploadParamsAddresses{}, "wasm/MsgAddCodeUploadParamsAddresses", nil)
 	cdc.RegisterConcrete(&MsgRemoveCodeUploadParamsAddresses{}, "wasm/MsgRemoveCodeUploadParamsAddresses", nil)
 	cdc.RegisterConcrete(&MsgStoreAndMigrateContract{}, "wasm/MsgStoreAndMigrateContract", nil)
-
-	cdc.RegisterConcrete(&PinCodesProposal{}, "wasm/PinCodesProposal", nil)
-	cdc.RegisterConcrete(&UnpinCodesProposal{}, "wasm/UnpinCodesProposal", nil)
-	cdc.RegisterConcrete(&StoreCodeProposal{}, "wasm/StoreCodeProposal", nil)
-	cdc.RegisterConcrete(&InstantiateContractProposal{}, "wasm/InstantiateContractProposal", nil)
-	cdc.RegisterConcrete(&InstantiateContract2Proposal{}, "wasm/InstantiateContract2Proposal", nil)
-	cdc.RegisterConcrete(&MigrateContractProposal{}, "wasm/MigrateContractProposal", nil)
-	cdc.RegisterConcrete(&SudoContractProposal{}, "wasm/SudoContractProposal", nil)
-	cdc.RegisterConcrete(&ExecuteContractProposal{}, "wasm/ExecuteContractProposal", nil)
-	cdc.RegisterConcrete(&UpdateAdminProposal{}, "wasm/UpdateAdminProposal", nil)
-	cdc.RegisterConcrete(&ClearAdminProposal{}, "wasm/ClearAdminProposal", nil)
-	cdc.RegisterConcrete(&UpdateInstantiateConfigProposal{}, "wasm/UpdateInstantiateConfigProposal", nil)
-	cdc.RegisterConcrete(&StoreAndInstantiateContractProposal{}, "wasm/StoreAndInstantiateContractProposal", nil)
+	cdc.RegisterConcrete(&MsgUpdateContractLabel{}, "wasm/MsgUpdateContractLabel", nil)
 
 	cdc.RegisterInterface((*ContractInfoExtension)(nil), nil)
 
@@ -83,21 +67,10 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgAddCodeUploadParamsAddresses{},
 		&MsgRemoveCodeUploadParamsAddresses{},
 		&MsgStoreAndMigrateContract{},
+		&MsgUpdateContractLabel{},
 	)
 	registry.RegisterImplementations(
 		(*v1beta1.Content)(nil),
-		&StoreCodeProposal{},
-		&InstantiateContractProposal{},
-		&InstantiateContract2Proposal{},
-		&MigrateContractProposal{},
-		&SudoContractProposal{},
-		&ExecuteContractProposal{},
-		&UpdateAdminProposal{},
-		&ClearAdminProposal{},
-		&PinCodesProposal{},
-		&UnpinCodesProposal{},
-		&UpdateInstantiateConfigProposal{},
-		&StoreAndInstantiateContractProposal{},
 	)
 
 	registry.RegisterInterface("cosmwasm.wasm.v1.ContractInfoExtension", (*ContractInfoExtension)(nil))
@@ -126,24 +99,4 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-}
-
-var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc references the global x/wasm module codec.
-
-	ModuleCdc = codec.NewAminoCodec(amino)
-)
-
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	cryptocodec.RegisterCrypto(amino)
-	amino.Seal()
-
-	// Register all Amino interfaces and concrete types on the authz  and gov Amino codec so that this can later be
-	// used to properly serialize MsgGrant, MsgExec and MsgSubmitProposal instances
-	RegisterLegacyAminoCodec(authzcodec.Amino)
-	RegisterLegacyAminoCodec(govcodec.Amino)
-	RegisterLegacyAminoCodec(groupcodec.Amino)
 }

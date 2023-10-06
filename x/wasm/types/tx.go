@@ -74,10 +74,6 @@ func (msg MsgStoreCode) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgStoreCode) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgStoreCode) GetSigners() []sdk.AccAddress {
 	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
@@ -107,8 +103,8 @@ func (msg MsgInstantiateContract) ValidateBasic() error {
 		return errorsmod.Wrap(err, "label")
 	}
 
-	if !msg.Funds.IsValid() {
-		return sdkerrors.ErrInvalidCoins
+	if err := msg.Funds.Validate(); err != nil {
+		return errorsmod.Wrap(err, "funds")
 	}
 
 	if len(msg.Admin) != 0 {
@@ -120,10 +116,6 @@ func (msg MsgInstantiateContract) ValidateBasic() error {
 		return errorsmod.Wrap(err, "payload msg")
 	}
 	return nil
-}
-
-func (msg MsgInstantiateContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgInstantiateContract) GetSigners() []sdk.AccAddress {
@@ -150,17 +142,13 @@ func (msg MsgExecuteContract) ValidateBasic() error {
 		return errorsmod.Wrap(err, "contract")
 	}
 
-	if !msg.Funds.IsValid() {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, "sentFunds")
+	if err := msg.Funds.Validate(); err != nil {
+		return errorsmod.Wrap(err, "funds")
 	}
 	if err := msg.Msg.ValidateBasic(); err != nil {
 		return errorsmod.Wrap(err, "payload msg")
 	}
 	return nil
-}
-
-func (msg MsgExecuteContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgExecuteContract) GetSigners() []sdk.AccAddress {
@@ -212,10 +200,6 @@ func (msg MsgMigrateContract) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgMigrateContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgMigrateContract) GetSigners() []sdk.AccAddress {
 	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
@@ -263,10 +247,6 @@ func (msg MsgUpdateAdmin) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgUpdateAdmin) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUpdateAdmin) GetSigners() []sdk.AccAddress {
 	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
@@ -293,10 +273,6 @@ func (msg MsgClearAdmin) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgClearAdmin) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgClearAdmin) GetSigners() []sdk.AccAddress {
 	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
@@ -317,10 +293,6 @@ func (msg MsgIBCSend) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgIBCSend) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgIBCSend) GetSigners() []sdk.AccAddress {
 	return nil
 }
@@ -335,10 +307,6 @@ func (msg MsgIBCCloseChannel) Type() string {
 
 func (msg MsgIBCCloseChannel) ValidateBasic() error {
 	return nil
-}
-
-func (msg MsgIBCCloseChannel) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgIBCCloseChannel) GetSigners() []sdk.AccAddress {
@@ -368,8 +336,8 @@ func (msg MsgInstantiateContract2) ValidateBasic() error {
 		return errorsmod.Wrap(err, "label")
 	}
 
-	if !msg.Funds.IsValid() {
-		return sdkerrors.ErrInvalidCoins
+	if err := msg.Funds.Validate(); err != nil {
+		return errorsmod.Wrap(err, "funds")
 	}
 
 	if len(msg.Admin) != 0 {
@@ -384,10 +352,6 @@ func (msg MsgInstantiateContract2) ValidateBasic() error {
 		return errorsmod.Wrap(err, "salt")
 	}
 	return nil
-}
-
-func (msg MsgInstantiateContract2) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgInstantiateContract2) GetSigners() []sdk.AccAddress {
@@ -426,10 +390,6 @@ func (msg MsgUpdateInstantiateConfig) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgUpdateInstantiateConfig) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUpdateInstantiateConfig) GetSigners() []sdk.AccAddress {
 	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
@@ -452,10 +412,6 @@ func (msg MsgUpdateParams) GetSigners() []sdk.AccAddress {
 		panic(err.Error())
 	}
 	return []sdk.AccAddress{authority}
-}
-
-func (msg MsgUpdateParams) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgUpdateParams) ValidateBasic() error {
@@ -481,18 +437,14 @@ func (msg MsgPinCodes) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{authority}
 }
 
-func (msg MsgPinCodes) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-const maxCodeIDTotal = 50
-
 func (msg MsgPinCodes) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "authority")
 	}
 	return validateCodeIDs(msg.CodeIDs)
 }
+
+const maxCodeIDTotal = 50
 
 // ensure not empty, not duplicates and not exceeding max number
 func validateCodeIDs(codeIDs []uint64) error {
@@ -524,10 +476,6 @@ func (msg MsgUnpinCodes) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{authority}
 }
 
-func (msg MsgUnpinCodes) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUnpinCodes) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "authority")
@@ -549,10 +497,6 @@ func (msg MsgSudoContract) GetSigners() []sdk.AccAddress {
 		panic(err.Error())
 	}
 	return []sdk.AccAddress{authority}
-}
-
-func (msg MsgSudoContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgSudoContract) ValidateBasic() error {
@@ -584,10 +528,6 @@ func (msg MsgStoreAndInstantiateContract) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{authority}
 }
 
-func (msg MsgStoreAndInstantiateContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgStoreAndInstantiateContract) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "authority")
@@ -597,8 +537,8 @@ func (msg MsgStoreAndInstantiateContract) ValidateBasic() error {
 		return errorsmod.Wrap(err, "label")
 	}
 
-	if !msg.Funds.IsValid() {
-		return sdkerrors.ErrInvalidCoins
+	if err := msg.Funds.Validate(); err != nil {
+		return errorsmod.Wrap(err, "funds")
 	}
 
 	if len(msg.Admin) != 0 {
@@ -643,10 +583,6 @@ func (msg MsgAddCodeUploadParamsAddresses) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{authority}
 }
 
-func (msg MsgAddCodeUploadParamsAddresses) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgAddCodeUploadParamsAddresses) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "authority")
@@ -673,10 +609,6 @@ func (msg MsgRemoveCodeUploadParamsAddresses) GetSigners() []sdk.AccAddress {
 		panic(err.Error())
 	}
 	return []sdk.AccAddress{authority}
-}
-
-func (msg MsgRemoveCodeUploadParamsAddresses) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgRemoveCodeUploadParamsAddresses) ValidateBasic() error {
@@ -722,10 +654,6 @@ func (msg MsgStoreAndMigrateContract) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{authority}
 }
 
-func (msg MsgStoreAndMigrateContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgStoreAndMigrateContract) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "authority")
@@ -761,4 +689,33 @@ func hasDuplicates[T comparable](s []T) bool {
 		index[v] = struct{}{}
 	}
 	return false
+}
+
+func (msg MsgUpdateContractLabel) Route() string {
+	return RouterKey
+}
+
+func (msg MsgUpdateContractLabel) Type() string {
+	return "update-contract-label"
+}
+
+func (msg MsgUpdateContractLabel) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+		return errorsmod.Wrap(err, "sender")
+	}
+	if err := ValidateLabel(msg.NewLabel); err != nil {
+		return errorsmod.Wrap(err, "label")
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.Contract); err != nil {
+		return errorsmod.Wrap(err, "contract")
+	}
+	return nil
+}
+
+func (msg MsgUpdateContractLabel) GetSigners() []sdk.AccAddress {
+	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil { // should never happen as valid basic rejects invalid addresses
+		panic(err.Error())
+	}
+	return []sdk.AccAddress{senderAddr}
 }

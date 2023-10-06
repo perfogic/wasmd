@@ -28,7 +28,7 @@ var hackatomContract []byte
 
 func TestStoreCode(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 	_, _, sender := testdata.KeyTestPubAddr()
 	msg := types.MsgStoreCodeFixture(func(m *types.MsgStoreCode) {
 		m.WASMByteCode = wasmContract
@@ -57,7 +57,7 @@ func TestStoreCode(t *testing.T) {
 
 func TestUpdateParams(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 
 	var (
 		myAddress              sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -147,7 +147,7 @@ func TestUpdateParams(t *testing.T) {
 
 func TestAddCodeUploadParamsAddresses(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 
 	var (
 		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -243,7 +243,7 @@ func TestAddCodeUploadParamsAddresses(t *testing.T) {
 
 func TestRemoveCodeUploadParamsAddresses(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 
 	var (
 		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -339,7 +339,7 @@ func TestRemoveCodeUploadParamsAddresses(t *testing.T) {
 
 func TestPinCodes(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -396,7 +396,7 @@ func TestPinCodes(t *testing.T) {
 
 func TestUnpinCodes(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false)
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -461,7 +461,7 @@ func TestUnpinCodes(t *testing.T) {
 
 func TestSudoContract(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -552,7 +552,7 @@ func TestSudoContract(t *testing.T) {
 
 func TestStoreAndInstantiateContract(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -612,7 +612,7 @@ func TestStoreAndInstantiateContract(t *testing.T) {
 
 func TestUpdateAdmin(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -677,7 +677,7 @@ func TestUpdateAdmin(t *testing.T) {
 
 func TestClearAdmin(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -739,7 +739,7 @@ func TestClearAdmin(t *testing.T) {
 
 func TestMigrateContract(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -826,7 +826,7 @@ func TestMigrateContract(t *testing.T) {
 
 func TestInstantiateContract(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -898,7 +898,7 @@ func TestInstantiateContract(t *testing.T) {
 
 func TestInstantiateContract2(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		myAddress sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -977,7 +977,7 @@ func TestInstantiateContract2(t *testing.T) {
 
 func TestUpdateInstantiateConfig(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	var (
 		creator   sdk.AccAddress = make([]byte, types.ContractAddrLen)
@@ -1051,7 +1051,7 @@ func TestUpdateInstantiateConfig(t *testing.T) {
 
 func TestStoreAndMigrateContract(t *testing.T) {
 	wasmApp := app.Setup(t)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
 
 	checksum, err := wasmvm.CreateChecksum(hackatomContract)
 	require.NoError(t, err)
@@ -1141,6 +1141,89 @@ func TestStoreAndMigrateContract(t *testing.T) {
 			require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &result))
 			assert.Equal(t, spec.expChecksum, result.Checksum)
 			require.NotZero(t, result.CodeID)
+		})
+	}
+}
+
+func TestUpdateContractLabel(t *testing.T) {
+	wasmApp := app.Setup(t)
+	ctx := wasmApp.BaseApp.NewContextLegacy(false, tmproto.Header{Time: time.Now()})
+
+	var (
+		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
+		authority                      = wasmApp.WasmKeeper.GetAuthority()
+		_, _, otherAddr                = testdata.KeyTestPubAddr()
+	)
+
+	specs := map[string]struct {
+		addr     string
+		newLabel string
+		expErr   bool
+	}{
+		"authority can update contract label": {
+			addr:     authority,
+			newLabel: "new label",
+			expErr:   false,
+		},
+		"admin can update contract label": {
+			addr:     myAddress.String(),
+			newLabel: "new label",
+			expErr:   false,
+		},
+		"other address cannot update contract label": {
+			addr:     otherAddr.String(),
+			newLabel: "new label",
+			expErr:   true,
+		},
+		"empty new label": {
+			addr:   authority,
+			expErr: true,
+		},
+		"invalid new label": {
+			addr:     authority,
+			newLabel: " start with space ",
+			expErr:   true,
+		},
+	}
+	for name, spec := range specs {
+		t.Run(name, func(t *testing.T) {
+			// setup
+			msg := &types.MsgStoreAndInstantiateContract{
+				Authority:             spec.addr,
+				WASMByteCode:          wasmContract,
+				InstantiatePermission: &types.AllowEverybody,
+				Admin:                 myAddress.String(),
+				UnpinCode:             false,
+				Label:                 "old label",
+				Msg:                   []byte(`{}`),
+				Funds:                 sdk.Coins{},
+			}
+			rsp, err := wasmApp.MsgServiceRouter().Handler(msg)(ctx, msg)
+			require.NoError(t, err)
+			var storeAndInstantiateResponse types.MsgStoreAndInstantiateContractResponse
+			require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &storeAndInstantiateResponse))
+
+			contract := storeAndInstantiateResponse.Address
+			contractAddr, err := sdk.AccAddressFromBech32(contract)
+			require.NoError(t, err)
+			require.Equal(t, "old label", wasmApp.WasmKeeper.GetContractInfo(ctx, contractAddr).Label)
+
+			// when
+			msgUpdateLabel := &types.MsgUpdateContractLabel{
+				Sender:   spec.addr,
+				NewLabel: spec.newLabel,
+				Contract: storeAndInstantiateResponse.Address,
+			}
+			_, err = wasmApp.MsgServiceRouter().Handler(msgUpdateLabel)(ctx, msgUpdateLabel)
+
+			// then
+			if spec.expErr {
+				require.Error(t, err)
+				require.Equal(t, "old label", wasmApp.WasmKeeper.GetContractInfo(ctx, contractAddr).Label)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, spec.newLabel, wasmApp.WasmKeeper.GetContractInfo(ctx, contractAddr).Label)
+			}
 		})
 	}
 }
