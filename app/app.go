@@ -147,7 +147,7 @@ var (
 	NodeDir      = ".oraid"
 	Bech32Prefix = "orai"
 
-	BinaryVersion = "v0.41.5"
+	BinaryVersion = "v1.0.0"
 )
 
 // These constants are derived from the above variables.
