@@ -206,7 +206,7 @@ replace (
 	// pin version! 126854af5e6d has issues with the store so that queries fail
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
-	// use informal system fork of tendermint
-	// See https://twitter.com/informalinc/status/1613580954383040512
-	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.26
+// use informal system fork of tendermint
+// // See https://twitter.com/informalinc/status/1613580954383040512
+// github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.26
 )
