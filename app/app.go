@@ -538,6 +538,14 @@ func NewWasmApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, &app.WasmKeeper, prefix) // The contract keeper needs to be set later
+	app.Ics20WasmHooks = &wasmHooks
+	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
+		app.IBCKeeper.ChannelKeeper,
+		app.Ics20WasmHooks,
+	)
+
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec, keys[ibcfeetypes.StoreKey],
@@ -627,7 +635,6 @@ func NewWasmApp(
 
 	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.WasmKeeper)
 
-	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
 	govModAddress := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
 	app.ClockKeeper = clockkeeper.NewKeeper(
@@ -635,13 +642,6 @@ func NewWasmApp(
 		appCodec,
 		*app.ContractKeeper,
 		govModAddress,
-	)
-
-	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, &app.WasmKeeper, prefix) // The contract keeper needs to be set later
-	app.Ics20WasmHooks = &wasmHooks
-	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
-		app.IBCKeeper.ChannelKeeper,
-		app.Ics20WasmHooks,
 	)
 
 	// DEPRECATED: DO NOT USE
@@ -673,8 +673,7 @@ func NewWasmApp(
 	var icaControllerStack porttypes.IBCModule
 	// integration point for custom authentication modules
 	// see https://medium.com/the-interchain-foundation/ibc-go-v6-changes-to-interchain-accounts-and-how-it-impacts-your-chain-806c185300d7
-	var noAuthzModule porttypes.IBCModule
-	icaControllerStack = icacontroller.NewIBCMiddleware(noAuthzModule, app.ICAControllerKeeper)
+	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.ICAControllerKeeper)
 	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper)
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
