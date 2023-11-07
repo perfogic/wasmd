@@ -210,7 +210,7 @@ func (c WasmdCli) runWithInput(args []string, input io.Reader) (output string, o
 				err = fmt.Errorf("recovered from panic: %v", r)
 			}
 		}()
-		cmd := exec.Command(locateExecutable("wasmd"), args...) //nolint:gosec
+		cmd := exec.Command(locateExecutable("oraid"), args...) //nolint:gosec
 		cmd.Dir = workDir
 		cmd.Stdin = input
 		return cmd.CombinedOutput()
