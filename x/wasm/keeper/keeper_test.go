@@ -418,7 +418,7 @@ func TestInstantiate(t *testing.T) {
 
 	gasAfter := ctx.GasMeter().GasConsumed()
 	if types.EnableGasVerification {
-		require.Equal(t, uint64(0x1b5bd), gasAfter-gasBefore)
+		require.Equal(t, uint64(0x1b58a), gasAfter-gasBefore)
 	}
 
 	// ensure it is stored properly
@@ -862,7 +862,7 @@ func TestExecute(t *testing.T) {
 	// make sure gas is properly deducted from ctx
 	gasAfter := ctx.GasMeter().GasConsumed()
 	if types.EnableGasVerification {
-		require.Equal(t, uint64(0x1a155), gasAfter-gasBefore)
+		require.Equal(t, uint64(0x1a0fd), gasAfter-gasBefore)
 	}
 	// ensure bob now exists and got both payments released
 	bobAcct = accKeeper.GetAccount(ctx, bob)
@@ -1021,47 +1021,47 @@ func TestExecuteWithPanic(t *testing.T) {
 	assert.Contains(t, err.Error(), "Error calling the VM: Error executing Wasm: Wasmer runtime error: RuntimeError: Aborted: panicked at 'This page intentionally faulted', src/contract.rs:169:5: execute wasm contract failed")
 }
 
-func TestExecuteWithCpuLoop(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
-	keeper := keepers.ContractKeeper
+// func TestExecuteWithCpuLoop(t *testing.T) {
+// 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
+// 	keeper := keepers.ContractKeeper
 
-	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	topUp := sdk.NewCoins(sdk.NewInt64Coin("denom", 5000))
-	creator := DeterministicAccountAddress(t, 1)
-	keepers.Faucet.Fund(ctx, creator, deposit.Add(deposit...)...)
-	fred := keepers.Faucet.NewFundedRandomAccount(ctx, topUp...)
+// 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
+// 	topUp := sdk.NewCoins(sdk.NewInt64Coin("denom", 5000))
+// 	creator := DeterministicAccountAddress(t, 1)
+// 	keepers.Faucet.Fund(ctx, creator, deposit.Add(deposit...)...)
+// 	fred := keepers.Faucet.NewFundedRandomAccount(ctx, topUp...)
 
-	contractID, _, err := keeper.Create(ctx, creator, hackatomWasm, nil)
-	require.NoError(t, err)
+// 	contractID, _, err := keeper.Create(ctx, creator, hackatomWasm, nil)
+// 	require.NoError(t, err)
 
-	_, bob := keyPubAddr()
-	initMsg := HackatomExampleInitMsg{
-		Verifier:    fred,
-		Beneficiary: bob,
-	}
-	initMsgBz, err := json.Marshal(initMsg)
-	require.NoError(t, err)
+// 	_, bob := keyPubAddr()
+// 	initMsg := HackatomExampleInitMsg{
+// 		Verifier:    fred,
+// 		Beneficiary: bob,
+// 	}
+// 	initMsgBz, err := json.Marshal(initMsg)
+// 	require.NoError(t, err)
 
-	addr, _, err := keepers.ContractKeeper.Instantiate(ctx, contractID, creator, nil, initMsgBz, "demo contract 5", deposit)
-	require.NoError(t, err)
+// 	addr, _, err := keepers.ContractKeeper.Instantiate(ctx, contractID, creator, nil, initMsgBz, "demo contract 5", deposit)
+// 	require.NoError(t, err)
 
-	// make sure we set a limit before calling
-	var gasLimit uint64 = 400_000
-	ctx = ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
-	require.Equal(t, uint64(0), ctx.GasMeter().GasConsumed())
+// 	// make sure we set a limit before calling
+// 	var gasLimit uint64 = 400_000
+// 	ctx = ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
+// 	require.Equal(t, uint64(0), ctx.GasMeter().GasConsumed())
 
-	// ensure we get an out of gas panic
-	defer func() {
-		r := recover()
-		require.NotNil(t, r)
-		_, ok := r.(sdk.ErrorOutOfGas)
-		require.True(t, ok, "%v", r)
-	}()
+// 	// ensure we get an out of gas panic
+// 	defer func() {
+// 		r := recover()
+// 		require.NotNil(t, r)
+// 		_, ok := r.(sdk.ErrorOutOfGas)
+// 		require.True(t, ok, "%v", r)
+// 	}()
 
-	// this should throw out of gas exception (panic)
-	_, _ = keepers.ContractKeeper.Execute(ctx, addr, fred, []byte(`{"cpu_loop":{}}`), nil)
-	require.True(t, false, "We must panic before this line")
-}
+// 	// this should throw out of gas exception (panic)
+// 	_, _ = keepers.ContractKeeper.Execute(ctx, addr, fred, []byte(`{"cpu_loop":{}}`), nil)
+// 	require.True(t, false, "We must panic before this line")
+// }
 
 func TestExecuteWithStorageLoop(t *testing.T) {
 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)

@@ -191,8 +191,8 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
-	// go list -m -json github.com/oraichain/wasmvm@23a6ff94315e80f773c1d13b9a6448dfd93c2764 | jq '.Version' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20231108083559-23a6ff94315e
+	// go list -m -json github.com/oraichain/wasmvm@6756cc9 | jq '.Version' -r
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20231108170250-6756cc9e9425
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@a88e0b424 | jq '.Version' -r

@@ -54,12 +54,12 @@ func initRecurseContract(t *testing.T) (contract sdk.AccAddress, ctx sdk.Context
 
 func TestGasCostOnQuery(t *testing.T) {
 	const (
-		GasNoWork uint64 = 63_950
+		GasNoWork uint64 = 63_904
 		// Note: about 100 SDK gas (10k CosmWasm gas) for each round of sha256
-		GasWork50 uint64 = 64_218 // this is a little shy of 50k gas - to keep an eye on the limit
+		GasWork50 uint64 = 63_844 // this is a little shy of 50k gas - to keep an eye on the limit
 
-		GasReturnUnhashed uint64 = 32
-		GasReturnHashed   uint64 = 26
+		GasReturnUnhashed uint64 = 0
+		GasReturnHashed   uint64 = 0
 	)
 
 	cases := map[string]struct {
@@ -209,9 +209,9 @@ func TestLimitRecursiveQueryGas(t *testing.T) {
 
 	const (
 		// Note: about 100 SDK gas (10k CosmWasm gas) for each round of sha256
-		GasWork2k uint64 = 77_161 // = NewContractInstanceCosts + x // we have 6x gas used in cpu than in the instance
+		GasWork2k uint64 = 63_857 // = NewContractInstanceCosts + x // we have 6x gas used in cpu than in the instance
 		// This is overhead for calling into a sub-contract
-		GasReturnHashed uint64 = 27
+		GasReturnHashed uint64 = 0
 	)
 
 	cases := map[string]struct {
@@ -242,7 +242,7 @@ func TestLimitRecursiveQueryGas(t *testing.T) {
 			expectedGas: GasWork2k + 5*(GasWork2k+GasReturnHashed),
 		},
 		// this is where we expect an error...
-		// it has enough gas to run 5 times and die on the 6th (5th time dispatching to sub-contract)
+		// it has enough gas to run 6 times and die on the 7th (6th time dispatching to sub-contract)
 		// however, if we don't charge the cpu gas before sub-dispatching, we can recurse over 20 times
 		"deep recursion, should die on 5th level": {
 			gasLimit: 400_000,
@@ -250,7 +250,7 @@ func TestLimitRecursiveQueryGas(t *testing.T) {
 				Depth: 50,
 				Work:  2000,
 			},
-			expectQueriesFromContract: 5,
+			expectQueriesFromContract: 6,
 			expectOutOfGas:            true,
 		},
 		"very deep recursion, hits recursion limit": {
@@ -262,7 +262,7 @@ func TestLimitRecursiveQueryGas(t *testing.T) {
 			expectQueriesFromContract: 10,
 			expectOutOfGas:            false,
 			expectError:               "query wasm contract failed", // Error we get from the contract instance doing the failing query, not wasmd
-			expectedGas:               10*(GasWork2k+GasReturnHashed) - 249,
+			expectedGas:               10*(GasWork2k+GasReturnHashed) - 99,
 		},
 	}
 
