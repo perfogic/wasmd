@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.2
 
 require (
-	github.com/CosmWasm/wasmvm v1.4.1
+	github.com/CosmWasm/wasmvm v1.5.0
 	github.com/CosmosContracts/juno/v18 v18.0.0-alpha.2
 	github.com/cosmos/cosmos-proto v1.0.0-beta.3
 	github.com/cosmos/cosmos-sdk v0.47.5
@@ -192,11 +192,12 @@ replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
 	// go list -m -json github.com/oraichain/wasmvm@6756cc9 | jq '.Version' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20231108170250-6756cc9e9425
+	// GOPRIVATE=github.com/oraichain/wasmvm if you get error: server response: not found: github.com/oraichain/wasmvm@v1.5.0: invalid version: unknown revision v1.5.0
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.0
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@a88e0b424 | jq '.Version' -r
-	github.com/cometbft/cometbft => github.com/oraichain/cometbft v0.0.0-20231108050510-a88e0b42462d
+	github.com/cometbft/cometbft => github.com/oraichain/cometbft v0.37.2
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2

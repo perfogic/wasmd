@@ -97,7 +97,7 @@ else
 endif
 
 install: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmd
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmd && mv $(GOPATH)/bin/wasmd $(GOPATH)/bin/oraid
 
 ########################################
 ### Tools & dependencies

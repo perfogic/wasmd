@@ -821,10 +821,10 @@ github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5/go.mod h1:/wsWhb9smxS
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
 github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
-github.com/oraichain/cometbft v0.0.0-20231108050510-a88e0b42462d h1:Nxgt1z6lxbpctU+FHwlQtwjNB24LlltRHk2wVqxIsUY=
-github.com/oraichain/cometbft v0.0.0-20231108050510-a88e0b42462d/go.mod h1:Y2MMMN//O5K4YKd8ze4r9jmk4Y7h0ajqILXbH5JQFVs=
-github.com/oraichain/wasmvm v1.1.4-0.20231108170250-6756cc9e9425 h1:Y1ZzlFYvo5ITxBinnOcEfum7IYpmkNs/Hxt5b/5Z7Vg=
-github.com/oraichain/wasmvm v1.1.4-0.20231108170250-6756cc9e9425/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
+github.com/oraichain/cometbft v0.37.2 h1:pNwkSroyS9zR4JcaFKkN2+ycqEOjjQ1mBfYnQjX2FYQ=
+github.com/oraichain/cometbft v0.37.2/go.mod h1:Y2MMMN//O5K4YKd8ze4r9jmk4Y7h0ajqILXbH5JQFVs=
+github.com/oraichain/wasmvm v1.5.0 h1:BzfjTTU3H/TdxukGKnmAjXwtBC3K4VQxfKmBdzASaMA=
+github.com/oraichain/wasmvm v1.5.0/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/pact-foundation/pact-go v1.0.4/go.mod h1:uExwJY4kCzNPcHRj+hCR/HBbOOIwwtUjcrb0b5/5kLM=

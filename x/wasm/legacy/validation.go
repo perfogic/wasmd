@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"regexp"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/CosmWasm/wasmd/x/wasm/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -34,13 +34,13 @@ func validateSourceURL(source string) error {
 	if source != "" {
 		u, err := url.Parse(source)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrInvalid, "not an url")
+			return errorsmod.Wrap(types.ErrInvalid, "not an url")
 		}
 		if !u.IsAbs() {
-			return sdkerrors.Wrap(types.ErrInvalid, "not an absolute url")
+			return errorsmod.Wrap(types.ErrInvalid, "not an absolute url")
 		}
 		if u.Scheme != "https" {
-			return sdkerrors.Wrap(types.ErrInvalid, "must use https")
+			return errorsmod.Wrap(types.ErrInvalid, "must use https")
 		}
 	}
 	return nil
@@ -48,7 +48,7 @@ func validateSourceURL(source string) error {
 
 func validateBuilder(buildTag string) error {
 	if len(buildTag) > MaxBuildTagSize {
-		return sdkerrors.Wrap(types.ErrLimit, "longer than 128 characters")
+		return errorsmod.Wrap(types.ErrLimit, "longer than 128 characters")
 	}
 
 	if buildTag != "" {
@@ -62,20 +62,20 @@ func validateBuilder(buildTag string) error {
 
 func validateWasmCode(s []byte) error {
 	if len(s) == 0 {
-		return sdkerrors.Wrap(types.ErrEmpty, "is required")
+		return errorsmod.Wrap(types.ErrEmpty, "is required")
 	}
 	if len(s) > MaxWasmSize {
-		return sdkerrors.Wrapf(types.ErrLimit, "cannot be longer than %d bytes", MaxWasmSize)
+		return errorsmod.Wrapf(types.ErrLimit, "cannot be longer than %d bytes", MaxWasmSize)
 	}
 	return nil
 }
 
 func validateLabel(label string) error {
 	if label == "" {
-		return sdkerrors.Wrap(types.ErrEmpty, "is required")
+		return errorsmod.Wrap(types.ErrEmpty, "is required")
 	}
 	if len(label) > MaxLabelSize {
-		return sdkerrors.Wrap(types.ErrLimit, "cannot be longer than 128 characters")
+		return errorsmod.Wrap(types.ErrLimit, "cannot be longer than 128 characters")
 	}
 	return nil
 }
