@@ -194,8 +194,8 @@ replace (
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20231016035742-9fd1ab8cfa2f
 
 	// use Oraichain fork of cometbft
-	// go list -m -json github.com/oraichain/cometbft@9ae2e3b05 | jq '.Version' -r
-	github.com/cometbft/cometbft => github.com/oraichain/cometbft v0.0.0-20231108043519-9ae2e3b0586a
+	// go list -m -json github.com/oraichain/cometbft@a88e0b424 | jq '.Version' -r
+	github.com/cometbft/cometbft => github.com/oraichain/cometbft v0.0.0-20231108050510-a88e0b42462d
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
