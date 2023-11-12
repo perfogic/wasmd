@@ -49,3 +49,4 @@ contract_tests/*
 
 # data
 .oraid
+*env*

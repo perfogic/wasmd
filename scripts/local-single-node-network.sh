@@ -14,7 +14,7 @@ mkdir $HOME/.oraid/validator1
 oraid init --chain-id=testing validator1 --home=$HOME/.oraid/validator1
 
 # create keys for all three validators
-oraid keys add validator1 --keyring-backend test --home=$HOME/.oraid/validator1
+(cat .env) | oraid keys add validator1 --recover --keyring-backend test --home=$HOME/.oraid/validator1
 
 update_genesis () {    
     cat $HOME/.oraid/validator1/config/genesis.json | jq "$1" > $HOME/.oraid/validator1/config/tmp_genesis.json && mv $HOME/.oraid/validator1/config/tmp_genesis.json $HOME/.oraid/validator1/config/genesis.json
@@ -30,7 +30,7 @@ oraid genesis collect-gentxs --home=$HOME/.oraid/validator1
 oraid genesis validate-genesis --home=$HOME/.oraid/validator1
 
 # update staking genesis
-update_genesis '.app_state["staking"]["params"]["unbonding_time"]="240s"'
+update_genesis '.app_state["staking"]["params"]["unbonding_time"]="1209600s"'
 
 # update crisis variable to orai
 update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
@@ -77,9 +77,9 @@ BACKGROUND=${BACKGROUND:-""}
 # if the $BACKGROUND env var is empty, then we run foreground mode
 if [ -z "$BACKGROUND" ]
 then
-    oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai
+    oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
 else
-    screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai
+    screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
     echo "Validator 1 are up and running!"
 fi
 
