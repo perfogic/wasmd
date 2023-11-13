@@ -191,9 +191,9 @@ require (
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
-	// go list -m -json github.com/oraichain/wasmvm@6756cc9 | jq '.Version' -r
+	// go list -m -json github.com/oraichain/wasmvm@9dc3bcf | jq '.Version' -r
 	// GOPRIVATE=github.com/oraichain/wasmvm if you get error: server response: not found: github.com/oraichain/wasmvm@v1.5.0: invalid version: unknown revision v1.5.0
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.0
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20231113025234-9dc3bcf7b094
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@a88e0b424 | jq '.Version' -r
