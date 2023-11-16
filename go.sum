@@ -823,8 +823,8 @@ github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/oraichain/cometbft v0.37.2 h1:pNwkSroyS9zR4JcaFKkN2+ycqEOjjQ1mBfYnQjX2FYQ=
 github.com/oraichain/cometbft v0.37.2/go.mod h1:Y2MMMN//O5K4YKd8ze4r9jmk4Y7h0ajqILXbH5JQFVs=
-github.com/oraichain/wasmvm v1.1.4-0.20231113025234-9dc3bcf7b094 h1:i/fqX/o1C+kRVaD2N5h+Hb/bNWCGwREbkMom6FUcgmQ=
-github.com/oraichain/wasmvm v1.1.4-0.20231113025234-9dc3bcf7b094/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
+github.com/oraichain/wasmvm v1.5.0 h1:BzfjTTU3H/TdxukGKnmAjXwtBC3K4VQxfKmBdzASaMA=
+github.com/oraichain/wasmvm v1.5.0/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/pact-foundation/pact-go v1.0.4/go.mod h1:uExwJY4kCzNPcHRj+hCR/HBbOOIwwtUjcrb0b5/5kLM=
