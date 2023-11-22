@@ -401,7 +401,7 @@ func TestEncoding(t *testing.T) {
 		"stargate encoded bank msg": {
 			sender: addr2,
 			srcMsg: wasmvmtypes.CosmosMsg{
-				Stargate: &wasmvmtypes.StargateMsg{
+				Any: &wasmvmtypes.AnyMsg{
 					TypeURL: "/cosmos.bank.v1beta1.MsgSend",
 					Value:   bankMsgBin,
 				},
@@ -411,7 +411,7 @@ func TestEncoding(t *testing.T) {
 		"stargate encoded msg with any type": {
 			sender: addr2,
 			srcMsg: wasmvmtypes.CosmosMsg{
-				Stargate: &wasmvmtypes.StargateMsg{
+				Any: &wasmvmtypes.AnyMsg{
 					TypeURL: "/cosmos.gov.v1.MsgSubmitProposal",
 					Value:   proposalMsgBin,
 				},
@@ -421,7 +421,7 @@ func TestEncoding(t *testing.T) {
 		"stargate encoded invalid typeUrl": {
 			sender: addr2,
 			srcMsg: wasmvmtypes.CosmosMsg{
-				Stargate: &wasmvmtypes.StargateMsg{
+				Any: &wasmvmtypes.AnyMsg{
 					TypeURL: "/cosmos.bank.v2.MsgSend",
 					Value:   bankMsgBin,
 				},

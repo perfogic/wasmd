@@ -319,8 +319,13 @@ func (k Keeper) instantiate(
 	gas := k.runtimeGasForContract(sdkCtx)
 	res, gasUsed, err := k.wasmVM.Instantiate(codeInfo.CodeHash, env, info, initMsg, vmStore, cosmwasmAPI, querier, k.gasMeter(sdkCtx), gas, costJSONDeserialization)
 	k.consumeRuntimeGas(sdkCtx, gasUsed)
+
 	if err != nil {
 		return nil, nil, errorsmod.Wrap(types.ErrInstantiateFailed, err.Error())
+	}
+
+	if len(res.Err) > 0 {
+		return nil, nil, errorsmod.Wrap(types.ErrInstantiateFailed, res.Err)
 	}
 
 	// persist instance first
@@ -365,7 +370,7 @@ func (k Keeper) instantiate(
 	))
 
 	sdkCtx = types.WithSubMsgAuthzPolicy(sdkCtx, authPolicy.SubMessageAuthorizationPolicy(types.AuthZActionInstantiate))
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -400,8 +405,13 @@ func (k Keeper) execute(ctx context.Context, contractAddress, caller sdk.AccAddr
 	gas := k.runtimeGasForContract(sdkCtx)
 	res, gasUsed, execErr := k.wasmVM.Execute(codeInfo.CodeHash, env, info, msg, prefixStore, cosmwasmAPI, querier, k.gasMeter(sdkCtx), gas, costJSONDeserialization)
 	k.consumeRuntimeGas(sdkCtx, gasUsed)
+
 	if execErr != nil {
 		return nil, errorsmod.Wrap(types.ErrExecuteFailed, execErr.Error())
+	}
+
+	if len(res.Err) > 0 {
+		return nil, errorsmod.Wrap(types.ErrExecuteFailed, res.Err)
 	}
 
 	sdkCtx.EventManager().EmitEvent(sdk.NewEvent(
@@ -409,7 +419,7 @@ func (k Keeper) execute(ctx context.Context, contractAddress, caller sdk.AccAddr
 		sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddress.String()),
 	))
 
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -477,6 +487,11 @@ func (k Keeper) migrate(
 	if err != nil {
 		return nil, errorsmod.Wrap(types.ErrMigrationFailed, err.Error())
 	}
+
+	if len(res.Err) > 0 {
+		return nil, errorsmod.Wrap(types.ErrMigrationFailed, res.Err)
+	}
+
 	// delete old secondary index entry
 	err = k.removeFromContractCodeSecondaryIndex(ctx, contractAddress, k.mustGetLastContractHistoryEntry(sdkCtx, contractAddress))
 	if err != nil {
@@ -501,7 +516,7 @@ func (k Keeper) migrate(
 	))
 
 	sdkCtx = types.WithSubMsgAuthzPolicy(sdkCtx, authZ.SubMessageAuthorizationPolicy(types.AuthZActionMigrateContract))
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -540,13 +555,17 @@ func (k Keeper) Sudo(ctx context.Context, contractAddress sdk.AccAddress, msg []
 		return nil, errorsmod.Wrap(types.ErrExecuteFailed, execErr.Error())
 	}
 
+	if len(res.Err) > 0 {
+		return nil, errorsmod.Wrap(types.ErrExecuteFailed, res.Err)
+	}
+
 	sdkCtx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeSudo,
 		sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddress.String()),
 	))
 
 	// sudo submessages are executed with the default authorization policy
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -577,12 +596,16 @@ func (k Keeper) reply(ctx sdk.Context, contractAddress sdk.AccAddress, reply was
 		return nil, errorsmod.Wrap(types.ErrExecuteFailed, execErr.Error())
 	}
 
+	if len(res.Err) > 0 {
+		return nil, errorsmod.Wrap(types.ErrExecuteFailed, res.Err)
+	}
+
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeReply,
 		sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddress.String()),
 	))
 
-	data, err := k.handleContractResponse(ctx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	data, err := k.handleContractResponse(ctx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -759,7 +782,7 @@ func (k Keeper) QuerySmart(ctx context.Context, contractAddr sdk.AccAddress, req
 	if qErr != nil {
 		return nil, errorsmod.Wrap(types.ErrQueryFailed, qErr.Error())
 	}
-	return queryResult, nil
+	return queryResult.Ok, nil
 }
 
 func checkAndIncreaseQueryStackSize(ctx context.Context, maxQueryStackSize uint32) (sdk.Context, error) {

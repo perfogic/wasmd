@@ -1,15 +1,33 @@
 package upgrades
 
 import (
+	"context"
+
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+
 	storetypes "cosmossdk.io/store/types"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 )
 
 type AppKeepers struct {
-	authkeeper.AccountKeeper
+	AccountKeeper         *authkeeper.AccountKeeper
+	ParamsKeeper          *paramskeeper.Keeper
+	ConsensusParamsKeeper *consensusparamkeeper.Keeper
+	Codec                 codec.Codec
+	GetStoreKey           func(storeKey string) *storetypes.KVStoreKey
+	CapabilityKeeper      *capabilitykeeper.Keeper
+	IBCKeeper             *ibckeeper.Keeper
+}
+type ModuleManager interface {
+	RunMigrations(ctx context.Context, cfg module.Configurator, fromVM module.VersionMap) (module.VersionMap, error)
+	GetVersionMap() module.VersionMap
 }
 
 // Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
@@ -21,6 +39,6 @@ type Upgrade struct {
 	UpgradeName string
 
 	// CreateUpgradeHandler defines the function that creates an upgrade handler
-	CreateUpgradeHandler func(*module.Manager, module.Configurator, *AppKeepers) upgradetypes.UpgradeHandler
+	CreateUpgradeHandler func(ModuleManager, module.Configurator, *AppKeepers) upgradetypes.UpgradeHandler
 	StoreUpgrades        storetypes.StoreUpgrades
 }

@@ -24,6 +24,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	"github.com/CosmWasm/wasmd/x/wasm/client/cli"
 	"github.com/CosmWasm/wasmd/x/wasm/exported"
@@ -98,6 +99,18 @@ func (b AppModuleBasic) RegisterInterfaces(registry cdctypes.InterfaceRegistry) 
 	types.RegisterInterfaces(registry)
 	// legacy support
 	legacy.RegisterInterfaces(registry)
+
+	// support legacy proposal querying
+	registry.RegisterImplementations(
+		(*v1beta1.Content)(nil),
+		&types.StoreCodeProposal{},
+		&types.InstantiateContractProposal{},
+		&types.MigrateContractProposal{},
+		&types.UpdateAdminProposal{},
+		&types.ClearAdminProposal{},
+		&types.PinCodesProposal{},
+		&types.UnpinCodesProposal{},
+	)
 }
 
 // ____________________________________________________________________________
