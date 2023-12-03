@@ -28,7 +28,7 @@ update_genesis () {
 update_genesis '.app_state["staking"]["params"]["bond_denom"]="orai"'
 
 # create validator node 1
-oraid genesis add-genesis-account $(oraid keys show validator1 -a --keyring-backend=test --home=$NODE_HOME | grep orai) 1000000000000orai,1000000000000stake --home=$NODE_HOME
+oraid genesis add-genesis-account $(oraid keys show validator1 -a --keyring-backend=test --home=$NODE_HOME | grep orai) 1000000000000000000000000orai,1000000000000stake --home=$NODE_HOME
 oraid genesis gentx validator1 500000000orai --keyring-backend=test --home=$NODE_HOME --chain-id=testing
 oraid genesis collect-gentxs --home=$NODE_HOME
 oraid genesis validate-genesis --home=$NODE_HOME
