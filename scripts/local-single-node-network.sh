@@ -2,32 +2,37 @@
 set -ux
 
 # always returns true so set -e doesn't exit if it is not running.
+# set install jq for ubuntu & mac. If failed we still can continue running
+apt install jq
+brew install jq
 killall oraid || true
 rm -rf $HOME/.oraid/
 killall screen
 
+NODE_HOME=${NODE_HOME:-"$HOME/.oraid/validator1"}
+
 # make four orai directories
 mkdir $HOME/.oraid
-mkdir $HOME/.oraid/validator1
+mkdir $NODE_HOME
 
 # init all three validators
-oraid init --chain-id=testing validator1 --home=$HOME/.oraid/validator1
+oraid init --chain-id=testing validator1 --home=$NODE_HOME
 
 # create keys for all three validators
-(cat .env) | oraid keys add validator1 --recover --keyring-backend test --home=$HOME/.oraid/validator1
+(cat .env) | oraid keys add validator1 --recover --keyring-backend test --home=$NODE_HOME
 
 update_genesis () {    
-    cat $HOME/.oraid/validator1/config/genesis.json | jq "$1" > $HOME/.oraid/validator1/config/tmp_genesis.json && mv $HOME/.oraid/validator1/config/tmp_genesis.json $HOME/.oraid/validator1/config/genesis.json
+    cat $NODE_HOME/config/genesis.json | jq "$1" > $NODE_HOME/config/tmp_genesis.json && mv $NODE_HOME/config/tmp_genesis.json $NODE_HOME/config/genesis.json
 }
 
 # change staking denom to orai
 update_genesis '.app_state["staking"]["params"]["bond_denom"]="orai"'
 
 # create validator node 1
-oraid genesis add-genesis-account $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1 | grep orai) 1000000000000orai,1000000000000stake --home=$HOME/.oraid/validator1
-oraid genesis gentx validator1 500000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing
-oraid genesis collect-gentxs --home=$HOME/.oraid/validator1
-oraid genesis validate-genesis --home=$HOME/.oraid/validator1
+oraid genesis add-genesis-account $(oraid keys show validator1 -a --keyring-backend=test --home=$NODE_HOME | grep orai) 1000000000000orai,1000000000000stake --home=$NODE_HOME
+oraid genesis gentx validator1 500000000orai --keyring-backend=test --home=$NODE_HOME --chain-id=testing
+oraid genesis collect-gentxs --home=$NODE_HOME
+oraid genesis validate-genesis --home=$NODE_HOME
 
 # update staking genesis
 update_genesis '.app_state["staking"]["params"]["unbonding_time"]="1209600s"'
@@ -46,10 +51,10 @@ update_genesis '.app_state["mint"]["params"]["mint_denom"]="orai"'
 # validator1 1317, 9090, 9091, 26658, 26657, 26656, 6060
 
 # change app.toml values
-VALIDATOR1_APP_TOML=$HOME/.oraid/validator1/config/app.toml
+VALIDATOR1_APP_TOML=$NODE_HOME/config/app.toml
 
 # change config.toml values
-VALIDATOR1_CONFIG=$HOME/.oraid/validator1/config/config.toml
+VALIDATOR1_CONFIG=$NODE_HOME/config/config.toml
 
 # Pruning - comment this configuration if you want to run upgrade script
 pruning="custom"
@@ -77,9 +82,9 @@ BACKGROUND=${BACKGROUND:-""}
 # if the $BACKGROUND env var is empty, then we run foreground mode
 if [ -z "$BACKGROUND" ]
 then
-    oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
+    oraid start --home=$NODE_HOME --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
 else
-    screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
+    screen -S validator1 -d -m oraid start --home=$NODE_HOME --minimum-gas-prices=0orai --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
     echo "Validator 1 are up and running!"
 fi
 
