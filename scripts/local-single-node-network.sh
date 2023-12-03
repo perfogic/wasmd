@@ -5,7 +5,6 @@ set -ux
 # set install jq for ubuntu & mac. If failed we still can continue running
 apt install jq
 brew install jq
-killall oraid || true
 rm -rf $HOME/.oraid/
 killall screen
 
