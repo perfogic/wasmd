@@ -41,6 +41,6 @@ func canonicalAddress(human string) ([]byte, uint64, error) {
 }
 
 var cosmwasmAPI = wasmvm.GoAPI{
-	HumanAddress:     humanAddress,
-	CanonicalAddress: canonicalAddress,
+	HumanizeAddress:     humanAddress,
+	CanonicalizeAddress: canonicalAddress,
 }

@@ -22,21 +22,31 @@ import (
 )
 
 func TestOnChanOpenInitVersion(t *testing.T) {
-	const startVersion = "v1"
+	const v1 = "v1"
 	specs := map[string]struct {
-		contractRsp *wasmvmtypes.IBC3ChannelOpenResponse
-		expVersion  string
+		startVersion string
+		contractRsp  *wasmvmtypes.IBC3ChannelOpenResponse
+		expVersion   string
+		expErr       bool
 	}{
 		"different version": {
-			contractRsp: &wasmvmtypes.IBC3ChannelOpenResponse{Version: "v2"},
-			expVersion:  "v2",
+			startVersion: v1,
+			contractRsp:  &wasmvmtypes.IBC3ChannelOpenResponse{Version: "v2"},
+			expVersion:   "v2",
 		},
 		"no response": {
-			expVersion: startVersion,
+			startVersion: v1,
+			expVersion:   v1,
 		},
 		"empty result": {
-			contractRsp: &wasmvmtypes.IBC3ChannelOpenResponse{},
-			expVersion:  startVersion,
+			startVersion: v1,
+			contractRsp:  &wasmvmtypes.IBC3ChannelOpenResponse{},
+			expVersion:   v1,
+		},
+		"empty versions should fail": {
+			startVersion: "",
+			contractRsp:  &wasmvmtypes.IBC3ChannelOpenResponse{},
+			expErr:       true,
 		},
 	}
 	for name, spec := range specs {
@@ -63,10 +73,17 @@ func TestOnChanOpenInitVersion(t *testing.T) {
 			coordinator.CreateConnections(path)
 			path.EndpointA.ChannelConfig = &ibctesting.ChannelConfig{
 				PortID:  contractInfo.IBCPortID,
-				Version: startVersion,
+				Version: spec.startVersion,
 				Order:   channeltypes.UNORDERED,
 			}
-			require.NoError(t, path.EndpointA.ChanOpenInit())
+			// when
+			gotErr := path.EndpointA.ChanOpenInit()
+			// then
+			if spec.expErr {
+				require.Error(t, gotErr)
+				return
+			}
+			require.NoError(t, gotErr)
 			assert.Equal(t, spec.expVersion, path.EndpointA.ChannelConfig.Version)
 		})
 	}
@@ -246,11 +263,13 @@ func NewCaptureAckTestContractEngine() *captureAckTestContractEngine {
 func (x *captureAckTestContractEngine) SubmitIBCPacket(t *testing.T, path *wasmibctesting.Path, chainA *wasmibctesting.TestChain, senderContractAddr sdk.AccAddress, packetData []byte) *[]byte {
 	t.Helper()
 	// prepare a bridge to send an ibc packet by an ordinary wasm execute message
-	x.MockWasmEngine.ExecuteFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, executeMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.Response, uint64, error) {
-		return &wasmvmtypes.Response{
-			Messages: []wasmvmtypes.SubMsg{{ID: 1, ReplyOn: wasmvmtypes.ReplyNever, Msg: wasmvmtypes.CosmosMsg{IBC: &wasmvmtypes.IBCMsg{SendPacket: &wasmvmtypes.SendPacketMsg{
-				ChannelID: path.EndpointA.ChannelID, Data: executeMsg, Timeout: wasmvmtypes.IBCTimeout{Block: &wasmvmtypes.IBCTimeoutBlock{Revision: 1, Height: 10000000}},
-			}}}}},
+	x.MockWasmEngine.ExecuteFn = func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, executeMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
+		return &wasmvmtypes.ContractResult{
+			Ok: &wasmvmtypes.Response{
+				Messages: []wasmvmtypes.SubMsg{{ID: 1, ReplyOn: wasmvmtypes.ReplyNever, Msg: wasmvmtypes.CosmosMsg{IBC: &wasmvmtypes.IBCMsg{SendPacket: &wasmvmtypes.SendPacketMsg{
+					ChannelID: path.EndpointA.ChannelID, Data: executeMsg, Timeout: wasmvmtypes.IBCTimeout{Block: &wasmvmtypes.IBCTimeoutBlock{Revision: 1, Height: 10000000}},
+				}}}}},
+			},
 		}, 0, nil
 	}
 	// capture acknowledgement

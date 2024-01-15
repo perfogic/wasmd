@@ -4,6 +4,7 @@ package keeper
 
 import (
 	"path/filepath"
+	"strings"
 
 	wasmvm "github.com/CosmWasm/wasmvm"
 
@@ -67,7 +68,7 @@ func NewKeeper(
 	// NewVM does a lot, so better not to create it and silently drop it.
 	if keeper.wasmVM == nil {
 		var err error
-		keeper.wasmVM, err = wasmvm.NewVM(filepath.Join(homeDir, "wasm"), availableCapabilities, contractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
+		keeper.wasmVM, err = wasmvm.NewVM(filepath.Join(homeDir, "wasm"), strings.Split(availableCapabilities, ","), contractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
 		if err != nil {
 			panic(err)
 		}

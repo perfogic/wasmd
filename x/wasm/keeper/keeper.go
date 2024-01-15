@@ -36,7 +36,7 @@ import (
 
 // contractMemoryLimit is the memory limit of each contract execution (in MiB)
 // constant value so all nodes run with the same limit.
-const contractMemoryLimit = 32
+const contractMemoryLimit = uint32(32)
 
 // Option is an extension point to instantiate keeper with non default values
 type Option interface {
@@ -365,7 +365,12 @@ func (k Keeper) instantiate(
 	))
 
 	sdkCtx = types.WithSubMsgAuthzPolicy(sdkCtx, authPolicy.SubMessageAuthorizationPolicy(types.AuthZActionInstantiate))
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+
+	if len(res.Err) > 0 {
+		return nil, nil, fmt.Errorf(res.Err)
+	}
+
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, nil, errorsmod.Wrap(err, "dispatch")
 	}
@@ -409,7 +414,11 @@ func (k Keeper) execute(ctx context.Context, contractAddress, caller sdk.AccAddr
 		sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddress.String()),
 	))
 
-	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Messages, res.Attributes, res.Data, res.Events)
+	if len(res.Err) > 0 {
+		return nil, fmt.Errorf(res.Err)
+	}
+
+	data, err := k.handleContractResponse(sdkCtx, contractAddress, contractInfo.IBCPortID, res.Ok.Messages, res.Ok.Attributes, res.Ok.Data, res.Ok.Events)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "dispatch")
 	}
