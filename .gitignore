@@ -47,3 +47,6 @@ dependency-graph.png
 *.out
 *.synctex.gz
 contract_tests/*
+
+# blockchain state
+.oraid

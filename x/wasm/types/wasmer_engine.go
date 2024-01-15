@@ -95,7 +95,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) ([]byte, uint64, error)
+	) (*wasmvmtypes.QueryResult, uint64, error)
 
 	// Migrate will migrate an existing contract to a new code binary.
 	// This takes storage of the data from the original contract and the CodeID of the new contract that should
@@ -169,7 +169,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) (*wasmvmtypes.IBC3ChannelOpenResponse, uint64, error)
+	) (*wasmvmtypes.IBCChannelOpenResult, uint64, error)
 
 	// IBCChannelConnect is available on IBC-enabled contracts and is a hook to call into
 	// during the handshake phase
@@ -183,7 +183,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
+	) (*wasmvmtypes.IBCBasicResult, uint64, error)
 
 	// IBCChannelClose is available on IBC-enabled contracts and is a hook to call into
 	// at the end of the channel lifetime
@@ -197,7 +197,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
+	) (*wasmvmtypes.IBCBasicResult, uint64, error)
 
 	// IBCPacketReceive is available on IBC-enabled contracts and is called when an incoming
 	// packet is received on a channel belonging to this contract
@@ -226,7 +226,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
+	) (*wasmvmtypes.IBCBasicResult, uint64, error)
 
 	// IBCPacketTimeout is available on IBC-enabled contracts and is called when an
 	// outgoing packet (previously sent by this contract) will probably never be executed.
@@ -241,7 +241,7 @@ type WasmEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
-	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
+	) (*wasmvmtypes.IBCBasicResult, uint64, error)
 
 	// Pin pins a code to an in-memory cache, such that is
 	// always loaded quickly when executed.

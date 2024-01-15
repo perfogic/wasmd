@@ -924,7 +924,6 @@ func (this *StoreCodeProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *InstantiateContractProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -975,7 +974,6 @@ func (this *InstantiateContractProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *InstantiateContract2Proposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1032,7 +1030,6 @@ func (this *InstantiateContract2Proposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *MigrateContractProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1069,7 +1066,6 @@ func (this *MigrateContractProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *SudoContractProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1103,7 +1099,6 @@ func (this *SudoContractProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *ExecuteContractProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1148,7 +1143,6 @@ func (this *ExecuteContractProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *UpdateAdminProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1182,7 +1176,6 @@ func (this *UpdateAdminProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *ClearAdminProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1213,7 +1206,6 @@ func (this *ClearAdminProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *PinCodesProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1249,7 +1241,6 @@ func (this *PinCodesProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *UnpinCodesProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1285,7 +1276,6 @@ func (this *UnpinCodesProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *AccessConfigUpdate) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1313,7 +1303,6 @@ func (this *AccessConfigUpdate) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *UpdateInstantiateConfigProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1349,7 +1338,6 @@ func (this *UpdateInstantiateConfigProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (this *StoreAndInstantiateContractProposal) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1415,7 +1403,6 @@ func (this *StoreAndInstantiateContractProposal) Equal(that interface{}) bool {
 	}
 	return true
 }
-
 func (m *StoreCodeProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2308,7 +2295,6 @@ func encodeVarintProposalLegacy(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *StoreCodeProposal) Size() (n int) {
 	if m == nil {
 		return 0
@@ -3067,7 +3053,6 @@ func (m *StoreCodeProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *InstantiateContractProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3365,7 +3350,6 @@ func (m *InstantiateContractProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *InstantiateContract2Proposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3717,7 +3701,6 @@ func (m *InstantiateContract2Proposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *MigrateContractProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3917,7 +3900,6 @@ func (m *MigrateContractProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *SudoContractProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4098,7 +4080,6 @@ func (m *SudoContractProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *ExecuteContractProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4345,7 +4326,6 @@ func (m *ExecuteContractProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *UpdateAdminProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4524,7 +4504,6 @@ func (m *UpdateAdminProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *ClearAdminProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4671,7 +4650,6 @@ func (m *ClearAdminProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *PinCodesProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -4862,7 +4840,6 @@ func (m *PinCodesProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *UnpinCodesProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5053,7 +5030,6 @@ func (m *UnpinCodesProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *AccessConfigUpdate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5156,7 +5132,6 @@ func (m *AccessConfigUpdate) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *UpdateInstantiateConfigProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5305,7 +5280,6 @@ func (m *UpdateInstantiateConfigProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *StoreAndInstantiateContractProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5772,7 +5746,6 @@ func (m *StoreAndInstantiateContractProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipProposalLegacy(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
