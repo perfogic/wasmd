@@ -17,7 +17,7 @@ var _ types.WasmEngine = &MockWasmEngine{}
 // MockWasmEngine implements types.WasmEngine for testing purpose. One or multiple messages can be stubbed.
 // Without a stub function a panic is thrown.
 type MockWasmEngine struct {
-	StoreCodeFn          func(codeID wasmvm.WasmCode) (wasmvm.Checksum, error)
+	StoreCodeFn          func(codeID wasmvm.WasmCode, gasLimit uint64) (wasmvm.Checksum, uint64, error)
 	StoreCodeUncheckedFn func(codeID wasmvm.WasmCode) (wasmvm.Checksum, error)
 	AnalyzeCodeFn        func(codeID wasmvm.Checksum) (*wasmvmtypes.AnalysisReport, error)
 	InstantiateFn        func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, initMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error)
@@ -86,11 +86,11 @@ func (m *MockWasmEngine) IBCPacketTimeout(codeID wasmvm.Checksum, env wasmvmtype
 // 	panic("Deprecated: use StoreCode instead")
 // }
 
-func (m *MockWasmEngine) StoreCode(codeID wasmvm.WasmCode) (wasmvm.Checksum, error) {
+func (m *MockWasmEngine) StoreCode(codeID wasmvm.WasmCode, gasLimit uint64) (wasmvm.Checksum, uint64, error) {
 	if m.StoreCodeFn == nil {
 		panic("not supposed to be called!")
 	}
-	return m.StoreCodeFn(codeID)
+	return m.StoreCodeFn(codeID, gasLimit)
 }
 
 func (m *MockWasmEngine) StoreCodeUnchecked(codeID wasmvm.WasmCode) (wasmvm.Checksum, error) {
@@ -189,9 +189,9 @@ var AlwaysPanicMockWasmEngine = &MockWasmEngine{}
 // SelfCallingInstMockWasmEngine prepares a WasmEngine mock that calls itself on instantiation.
 func SelfCallingInstMockWasmEngine(executeCalled *bool) *MockWasmEngine {
 	return &MockWasmEngine{
-		StoreCodeFn: func(code wasmvm.WasmCode) (wasmvm.Checksum, error) {
+		StoreCodeFn: func(code wasmvm.WasmCode, gasLimit uint64) (wasmvm.Checksum, uint64, error) {
 			anyCodeID := bytes.Repeat([]byte{0x1}, 32)
-			return anyCodeID, nil
+			return anyCodeID, 0, nil
 		},
 		InstantiateFn: func(codeID wasmvm.Checksum, env wasmvmtypes.Env, info wasmvmtypes.MessageInfo, initMsg []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
 			return &wasmvmtypes.ContractResult{
@@ -337,11 +337,12 @@ func NewIBCContractMockWasmEngine(c IBCContractCallbacks) *MockWasmEngine {
 	return m
 }
 
-func HashOnlyStoreCodeFn(code wasmvm.WasmCode) (wasmvm.Checksum, error) {
+func HashOnlyStoreCodeFn(code wasmvm.WasmCode, gasLimit uint64) (wasmvm.Checksum, uint64, error) {
 	if code == nil {
-		return nil, errorsmod.Wrap(types.ErrInvalid, "wasm code must not be nil")
+		return nil, 0, errorsmod.Wrap(types.ErrInvalid, "wasm code must not be nil")
 	}
-	return wasmvm.CreateChecksum(code)
+	checksum, err := wasmvm.CreateChecksum(code)
+	return checksum, 0, err
 }
 
 func NoOpInstantiateFn(wasmvm.Checksum, wasmvmtypes.Env, wasmvmtypes.MessageInfo, []byte, wasmvm.KVStore, wasmvm.GoAPI, wasmvm.Querier, wasmvm.GasMeter, uint64, wasmvmtypes.UFraction) (*wasmvmtypes.ContractResult, uint64, error) {
@@ -350,8 +351,8 @@ func NoOpInstantiateFn(wasmvm.Checksum, wasmvmtypes.Env, wasmvmtypes.MessageInfo
 	}, 0, nil
 }
 
-func NoOpStoreCodeFn(_ wasmvm.WasmCode) (wasmvm.Checksum, error) {
-	return rand.Bytes(32), nil
+func NoOpStoreCodeFn(_ wasmvm.WasmCode, _ uint64) (wasmvm.Checksum, uint64, error) {
+	return rand.Bytes(32), 0, nil
 }
 
 func HasIBCAnalyzeFn(wasmvm.Checksum) (*wasmvmtypes.AnalysisReport, error) {

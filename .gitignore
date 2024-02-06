@@ -50,3 +50,4 @@ contract_tests/*
 
 # blockchain state
 .oraid
+ tempDir

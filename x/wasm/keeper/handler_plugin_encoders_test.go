@@ -381,7 +381,7 @@ func TestEncoding(t *testing.T) {
 			srcMsg: wasmvmtypes.CosmosMsg{
 				Distribution: &wasmvmtypes.DistributionMsg{
 					FundCommunityPool: &wasmvmtypes.FundCommunityPoolMsg{
-						Amount: wasmvmtypes.Coins{
+						Amount: []wasmvmtypes.Coin{
 							wasmvmtypes.NewCoin(200, "stones"),
 							wasmvmtypes.NewCoin(200, "feathers"),
 						},
@@ -581,7 +581,7 @@ func TestEncodeGovMsg(t *testing.T) {
 			sender: myAddr,
 			srcMsg: wasmvmtypes.CosmosMsg{
 				Gov: &wasmvmtypes.GovMsg{
-					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Vote: wasmvmtypes.Yes},
+					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Option: wasmvmtypes.Yes},
 				},
 			},
 			output: []sdk.Msg{
@@ -596,7 +596,7 @@ func TestEncodeGovMsg(t *testing.T) {
 			sender: myAddr,
 			srcMsg: wasmvmtypes.CosmosMsg{
 				Gov: &wasmvmtypes.GovMsg{
-					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Vote: wasmvmtypes.No},
+					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Option: wasmvmtypes.No},
 				},
 			},
 			output: []sdk.Msg{
@@ -611,7 +611,7 @@ func TestEncodeGovMsg(t *testing.T) {
 			sender: myAddr,
 			srcMsg: wasmvmtypes.CosmosMsg{
 				Gov: &wasmvmtypes.GovMsg{
-					Vote: &wasmvmtypes.VoteMsg{ProposalId: 10, Vote: wasmvmtypes.Abstain},
+					Vote: &wasmvmtypes.VoteMsg{ProposalId: 10, Option: wasmvmtypes.Abstain},
 				},
 			},
 			output: []sdk.Msg{
@@ -626,7 +626,7 @@ func TestEncodeGovMsg(t *testing.T) {
 			sender: myAddr,
 			srcMsg: wasmvmtypes.CosmosMsg{
 				Gov: &wasmvmtypes.GovMsg{
-					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Vote: wasmvmtypes.NoWithVeto},
+					Vote: &wasmvmtypes.VoteMsg{ProposalId: 1, Option: wasmvmtypes.NoWithVeto},
 				},
 			},
 			output: []sdk.Msg{

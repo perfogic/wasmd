@@ -1512,8 +1512,8 @@ type sudoMsg struct {
 }
 
 type stealFundsMsg struct {
-	Recipient string            `json:"recipient"`
-	Amount    wasmvmtypes.Coins `json:"amount"`
+	Recipient string             `json:"recipient"`
+	Amount    []wasmvmtypes.Coin `json:"amount"`
 }
 
 func TestSudo(t *testing.T) {
@@ -1551,7 +1551,7 @@ func TestSudo(t *testing.T) {
 		// to end users (via Tx/Execute).
 		StealFunds: stealFundsMsg{
 			Recipient: community.String(),
-			Amount:    wasmvmtypes.Coins{wasmvmtypes.NewCoin(76543, "denom")},
+			Amount:    []wasmvmtypes.Coin{wasmvmtypes.NewCoin(76543, "denom")},
 		},
 	}
 	sudoMsg, err := json.Marshal(msg)

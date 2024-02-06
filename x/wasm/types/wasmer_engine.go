@@ -29,7 +29,7 @@ type WasmEngine interface {
 	// This must be done one time for given code, after which it can be
 	// instatitated many times, and each instance called many times.
 	// It does the same as StoreCodeUnchecked plus the static checks.
-	StoreCode(code wasmvm.WasmCode) (wasmvm.Checksum, error)
+	StoreCode(code wasmvm.WasmCode, gasLimit uint64) (wasmvm.Checksum, uint64, error)
 
 	// Create will compile the wasm code, and store the resulting pre-compile
 	// as well as the original code. Both can be referenced later via checksum

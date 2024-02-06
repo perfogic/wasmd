@@ -169,7 +169,7 @@ func (k Keeper) create(ctx context.Context, creator sdk.AccAddress, wasmCode []b
 	}
 
 	sdkCtx.GasMeter().ConsumeGas(k.gasRegister.CompileCosts(len(wasmCode)), "Compiling wasm bytecode")
-	checksum, err = k.wasmVM.StoreCode(wasmCode)
+	checksum, _, err = k.wasmVM.StoreCode(wasmCode, k.queryGasLimit)
 	if err != nil {
 		return 0, checksum, errorsmod.Wrap(types.ErrCreateFailed, err.Error())
 	}
@@ -1099,7 +1099,7 @@ func (k *Keeper) handleContractResponse(
 	msgs []wasmvmtypes.SubMsg,
 	attrs []wasmvmtypes.EventAttribute,
 	data []byte,
-	evts wasmvmtypes.Events,
+	evts []wasmvmtypes.Event,
 ) ([]byte, error) {
 	attributeGasCost := k.gasRegister.EventCosts(attrs, evts)
 	ctx.GasMeter().ConsumeGas(attributeGasCost, "Custom contract event attributes")

@@ -328,7 +328,7 @@ func EncodeIBCMsg(portSource types.ICS20TransferPortSource) func(ctx sdk.Context
 func EncodeGovMsg(sender sdk.AccAddress, msg *wasmvmtypes.GovMsg) ([]sdk.Msg, error) {
 	switch {
 	case msg.Vote != nil:
-		voteOption, err := convertVoteOption(msg.Vote.Vote)
+		voteOption, err := convertVoteOption(msg.Vote.Option)
 		if err != nil {
 			return nil, errorsmod.Wrap(err, "vote option")
 		}
