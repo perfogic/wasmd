@@ -208,6 +208,8 @@ replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.1-0.20240206044315-806e864f05c6
+	// go list -m -json github.com/oraichain/cosmos-sdk@v0.50.1-eip191 | jq '.|"\(.Path) \(.Version)"' -r
+	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.50.2-0.20240227050747-739a9071eb6f
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
