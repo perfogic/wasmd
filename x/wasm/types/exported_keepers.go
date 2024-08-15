@@ -5,6 +5,7 @@ import (
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/v2/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -76,6 +77,12 @@ type ContractOpsKeeper interface {
 	// UnpinCode removes the wasm contract from wasmvm cache
 	UnpinCode(ctx sdk.Context, codeID uint64) error
 
+	// SetGasless set the gasless wasm contract in wasmvm cache
+	SetGasless(ctx sdk.Context, contractAddress sdk.AccAddress) error
+
+	// UnsetGasless removes the gasless wasm contract from wasmvm cache
+	UnsetGasless(ctx sdk.Context, contractAddress sdk.AccAddress) error
+
 	// SetContractInfoExtension updates the extension point data that is stored with the contract info
 	SetContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra ContractInfoExtension) error
 
@@ -115,9 +122,29 @@ type IBCContractKeeper interface {
 		contractAddr sdk.AccAddress,
 		msg wasmvmtypes.IBCPacketTimeoutMsg,
 	) error
+	IBCSourceCallback(
+		ctx sdk.Context,
+		contractAddr sdk.AccAddress,
+		msg wasmvmtypes.IBCSourceCallbackMsg,
+	) error
+	IBCDestinationCallback(
+		ctx sdk.Context,
+		contractAddr sdk.AccAddress,
+		msg wasmvmtypes.IBCDestinationCallbackMsg,
+	) error
 	// ClaimCapability allows the transfer module to claim a capability
 	// that IBC module passes to it
 	ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) error
 	// AuthenticateCapability wraps the scopedKeeper's AuthenticateCapability function
 	AuthenticateCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) bool
+
+	// LoadAsyncAckPacket loads a previously stored packet. See StoreAsyncAckPacket for more details.
+	// Both the portID and channelID are the ones on the destination chain (the chain that this is executed on).
+	LoadAsyncAckPacket(ctx context.Context, portID, channelID string, sequence uint64) (channeltypes.Packet, error)
+	// StoreAsyncAckPacket stores a packet to be acknowledged later. These are packets that were
+	// received and processed by the contract, but the contract did not want to acknowledge them immediately.
+	// They are stored in the keeper until the contract calls "WriteAcknowledgement" to acknowledge them.
+	StoreAsyncAckPacket(ctx context.Context, packet channeltypes.Packet) error
+	// DeleteAsyncAckPacket deletes a previously stored packet. See StoreAsyncAckPacket for more details.
+	DeleteAsyncAckPacket(ctx context.Context, portID, channelID string, sequence uint64)
 }

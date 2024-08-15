@@ -2,6 +2,16 @@ package params
 
 // Default simulation operation weights for messages and gov proposals
 const (
+	StakePerAccount           = "stake_per_account"
+	InitiallyBondedValidators = "initially_bonded_validators"
+
+	DefaultWeightMsgCreateDenom      int = 100
+	DefaultWeightMsgMint             int = 100
+	DefaultWeightMsgBurn             int = 100
+	DefaultWeightMsgChangeAdmin      int = 100
+	DefaultWeightMsgSetDenomMetadata int = 100
+	DefaultWeightMsgForceTransfer    int = 100
+
 	DefaultWeightMsgSend                        int = 100
 	DefaultWeightMsgMultiSend                   int = 10
 	DefaultWeightMsgSetWithdrawAddress          int = 50
@@ -37,6 +47,8 @@ const (
 	DefaultWeightSudoContractProposal                int = 5
 	DefaultWeightPinCodesProposal                    int = 5
 	DefaultWeightUnpinCodesProposal                  int = 5
+	DefaultWeightSetGaslessContractsProposal         int = 5
+	DefaultWeightUnsetGaslessContractsProposal       int = 5
 	DefaultWeightUpdateInstantiateConfigProposal     int = 5
 	DefaultWeightStoreAndInstantiateContractProposal int = 5
 )

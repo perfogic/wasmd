@@ -24,6 +24,9 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
+// DefaultGasCostBuildAddress is the SDK gas cost to build a contract address
+const DefaultGasCostBuildAddress = 10
+
 var _ types.QueryServer = &GrpcQuerier{}
 
 type GrpcQuerier struct {
@@ -346,6 +349,29 @@ func (q GrpcQuerier) PinnedCodes(c context.Context, req *types.QueryPinnedCodesR
 	}, nil
 }
 
+func (q GrpcQuerier) GaslessContracts(c context.Context, req *types.QueryGaslessContractsRequest) (*types.QueryGaslessContractsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	r := make([]string, 0)
+
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(q.storeService.OpenKVStore(ctx)), types.GaslessContractIndexPrefix)
+	pageRes, err := query.FilteredPaginate(prefixStore, req.Pagination, func(key []byte, _ []byte, accumulate bool) (bool, error) {
+		if accumulate {
+			r = append(r, string(key))
+		}
+		return true, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryGaslessContractsResponse{
+		ContractAddresses: r,
+		Pagination:        pageRes,
+	}, nil
+}
+
 // Params returns params of the module.
 func (q GrpcQuerier) Params(c context.Context, _ *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
@@ -428,6 +454,10 @@ func (q GrpcQuerier) BuildAddress(c context.Context, req *types.QueryBuildAddres
 	if len(salt) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "empty salt")
 	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	defer ctx.GasMeter().ConsumeGas(DefaultGasCostBuildAddress, "build address")
+
 	if req.InitArgs == nil {
 		return &types.QueryBuildAddressResponse{
 			Address: BuildContractAddressPredictable(codeHash, creator, salt, []byte{}).String(),
